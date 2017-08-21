@@ -120,7 +120,7 @@ public class ArgusNotifier extends Notifier {
         Map<String, String> fields =
                 ImmutableMap.<String, String>builder()
                         .put("Build Result", contextualResult)
-                        .put("Build Number", build.getDisplayName().replaceAll("#", ""))
+                        .put("Build Number", String.valueOf(build.getNumber()))
                         .put("URL", url)
                         .build();
         annotation.setFields(fields);
