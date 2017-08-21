@@ -16,18 +16,18 @@ public class BuildResultsResolver {
         // No need for instantiation
     }
 
+    public static final String FIXED = "FIXED";
+    public static final String STILL_FAILING = "STILL FAILING";
+    public static final String UNKNOWN = "UNKNOWN";
     private static final Map<String, Double> BUILD_STATUS_MAPPING =
             ImmutableMap.<String, Double>builder()
                     .put(Result.ABORTED.toString(), -1.0)
                     .put(Result.NOT_BUILT.toString(), -0.5)
                     .put(Result.SUCCESS.toString(), 0.0)
+                    .put(UNKNOWN, 0.50)
                     .put(Result.UNSTABLE.toString(), 1.0)
                     .put(Result.FAILURE.toString(), 2.0)
                     .build();
-    public static final String FIXED = "FIXED";
-    public static final String STILL_FAILING = "STILL FAILING";
-    public static final String UNKNOWN = "UNKNOWN";
-
 
     public static String getContextualResult(@Nonnull AbstractBuild<?,?> build) {
 
@@ -59,9 +59,10 @@ public class BuildResultsResolver {
     }
 
     public static Double translateResultToNumber(Result result) {
-        if (result == null) {
-            return null;
+        String resultToReturn = UNKNOWN;
+        if (result != null) {
+            resultToReturn = result.toString();
         }
-        return BUILD_STATUS_MAPPING.get(result.toString());
+        return BUILD_STATUS_MAPPING.get(resultToReturn);
     }
 }
