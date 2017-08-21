@@ -1,0 +1,275 @@
+package org.jenkinsci.plugins.argusnotifier;
+
+import com.cloudbees.plugins.credentials.CredentialsMatchers;
+import com.cloudbees.plugins.credentials.CredentialsProvider;
+import com.cloudbees.plugins.credentials.common.StandardCredentials;
+import com.cloudbees.plugins.credentials.common.StandardListBoxModel;
+import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
+import com.cloudbees.plugins.credentials.common.UsernamePasswordCredentials;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.salesforce.dva.argus.sdk.ArgusService;
+import com.salesforce.dva.argus.sdk.entity.Annotation;
+import com.salesforce.dva.argus.sdk.entity.Metric;
+import com.salesforce.dva.argus.sdk.excpetions.TokenExpiredException;
+import hudson.Extension;
+import hudson.Launcher;
+import hudson.model.AbstractBuild;
+import hudson.model.AbstractProject;
+import hudson.model.BuildListener;
+import hudson.model.Result;
+import hudson.security.ACL;
+import hudson.tasks.*;
+import hudson.util.FormValidation;
+import hudson.util.ListBoxModel;
+import hudson.util.Secret;
+import jenkins.model.Jenkins;
+import net.sf.json.JSONObject;
+import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.QueryParameter;
+import org.kohsuke.stapler.StaplerRequest;
+
+import java.io.IOException;
+import java.time.OffsetDateTime;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * <p>
+ * When the user configures the project and enables this builder,
+ * {@link DescriptorImpl#newInstance(StaplerRequest)} is invoked
+ * and a new {@link ArgusNotifier} is created. The created
+ * instance is persisted to the project configuration XML by using
+ * XStream, so this allows you to use instance fields
+ * to remember the configuration.
+ *
+ * <p>
+ * When a build is performed, the {@link #perform} method will be invoked. 
+ *
+ * @author Justin Harringa
+ */
+public class ArgusNotifier extends Notifier {
+
+    // Fields in config.jelly must match the parameter names in the "DataBoundConstructor"
+    @DataBoundConstructor
+    public ArgusNotifier() {
+    }
+
+    @Override
+    public boolean perform(AbstractBuild<?,?> build, Launcher launcher, BuildListener listener) throws IOException, InterruptedException {
+        OffsetDateTime now = OffsetDateTime.now();
+        String argusUrl = getDescriptor().argusUrl;
+        String credentialsId = getDescriptor().credentialsId;
+        String scope = getDescriptor().scope;
+        String source = getDescriptor().source;
+        String projectName = build.getProject().getName();
+        String contextualResult = BuildResultsResolver.getContextualResult(build);
+
+        Jenkins jenkins = Jenkins.getInstance();
+        String rootUrl;
+        if (jenkins == null) {
+            listener.getLogger().println("Argus Notifier: Could not talk to Jenkins. Skipping...");
+            return false;
+        } else {
+            rootUrl = jenkins.getRootUrl();
+        }
+        String url = rootUrl == null ? build.getUrl() : rootUrl + build.getUrl();
+
+
+        Metric metric = new Metric();
+        metric.setScope(scope);
+        metric.setDisplayName(projectName);
+        metric.setMetric(projectName);
+        Map<String, String> tags =
+                ImmutableMap.<String, String>builder()
+                        .put("type", "buildstatus")
+                        .put("host", jenkins.getRootUrl())
+                        // TODO: add another tag for actual status and change value to 1?
+                        .build();
+
+        metric.setTags(tags);
+        Result result = build.getResult();
+        if (build.getResult() == null) {
+            listener.getLogger().println("Argus Notifier: Could not determine result. Skipping...");
+            return false;
+        }
+        Map<Long, Double> datapoints =
+                ImmutableMap.<Long, Double>builder()
+                        .put(now.toEpochSecond(), BuildResultsResolver.translateResultToNumber(result))
+                        .build();
+        metric.setDatapoints(datapoints);
+
+        Annotation annotation = new Annotation();
+        annotation.setScope(scope);
+        annotation.setTimestamp(now.toEpochSecond());
+        annotation.setId(projectName + String.valueOf(now.toEpochSecond()));
+        annotation.setSource(source);
+        annotation.setType("ALERT"); //TODO: different value?
+        annotation.setMetric(projectName);
+        annotation.setTags(tags);
+        Map<String, String> fields =
+                ImmutableMap.<String, String>builder()
+                        .put("Build Result", contextualResult)
+                        .put("Build Number", build.getDisplayName().replaceAll("#", ""))
+                        .put("URL", url)
+                        .build();
+        annotation.setFields(fields);
+
+        try (
+                ArgusService service = ArgusService.getInstance(argusUrl, 10)
+        ) {
+            UsernamePasswordCredentials credentials = getCredentialsById(credentialsId);
+            service.getAuthService().login(credentials.getUsername(), credentials.getPassword().getPlainText());
+            List<Metric> metrics =
+                    ImmutableList.<Metric>builder()
+                            .add(metric)
+                            .build();
+
+            // TODO: Send build time metric
+            service.getMetricService().putMetrics(metrics);
+
+            List<Annotation> annotations = ImmutableList.<Annotation>builder()
+                    .add(annotation)
+                    .build();
+            service.getAnnotationService().putAnnotations(annotations);
+
+            listener.getLogger().println("Argus Notifier: Sent message to Argus successfully!");
+            service.getAuthService().logout();
+        } catch (TokenExpiredException tokenExpired) {
+            listener.getLogger().println("Token EXPIRED!!"); //TODO: do something?
+        } catch (IOException e) {
+            listener.getLogger().println("Argus Notifier: Error - " + e.getMessage());
+        }
+        return true;
+    }
+
+    // Overridden for better type safety.
+    // If your plugin doesn't really define any property on Descriptor,
+    // you don't have to do this.
+    @Override
+    public DescriptorImpl getDescriptor() {
+        return (DescriptorImpl)super.getDescriptor();
+    }
+
+    @Override
+    public BuildStepMonitor getRequiredMonitorService() {
+        return BuildStepMonitor.STEP;
+    }
+
+    /**
+     * Descriptor for {@link ArgusNotifier}. Used as a singleton.
+     * The class is marked as public so that it can be accessed from views.
+     *
+     * TODO: is this section helpful?
+     * <p>
+     * See {@code src/main/resources/hudson/plugins/hello_world/ArgusNotifier/*.jelly}
+     * for the actual HTML fragment for the configuration screen.
+     */
+    @Extension // This indicates to Jenkins that this is an implementation of an extension point.
+    public static final class DescriptorImpl extends BuildStepDescriptor<Publisher> {
+        /**
+         * To persist global configuration information,
+         * simply store it in a field and call save().
+         *
+         * <p>
+         * If you don't want fields to be persisted, use {@code transient}.
+         */
+        private String credentialsId, argusUrl, scope, source;
+
+        public String getCredentialsId() {
+            return credentialsId;
+        }
+        public String getArgusUrl() {
+            return argusUrl;
+        }
+        public String getScope() {
+            return scope;
+        }
+        public String getSource() {
+            return source;
+        }
+
+        /**
+         * In order to load the persisted global configuration, you have to
+         * call load() in the constructor.
+         */
+        public DescriptorImpl() {
+            load();
+        }
+
+        public FormValidation doCheckCredentialsId(@QueryParameter String value) {
+            UsernamePasswordCredentials c = getCredentialsById(value);
+
+            if (c == null) {
+                return FormValidation.error("Please enter a Username with Password credentials id");
+            }
+
+            if(c.getUsername().length() == 0)
+                return FormValidation.error("This credential should have a username");
+
+            if (Secret.toString(c.getPassword()).length() == 0) {
+                return FormValidation.error("This credential should have a password");
+            }
+            return FormValidation.ok();
+        }
+
+        public boolean isApplicable(Class<? extends AbstractProject> aClass) {
+            // Indicates that this builder can be used with all kinds of project types 
+            return true;
+        }
+
+        /**
+         * This human readable name is used in the configuration screen.
+         */
+        public String getDisplayName() {
+            return "Argus Notifier";
+        }
+
+        @Override
+        public boolean configure(StaplerRequest req, JSONObject formData) throws FormException {
+            // To persist global configuration information,
+            // set that to properties and call save().
+            credentialsId = formData.getString("credentialsId");
+            argusUrl = formData.getString("argusUrl");
+            scope = formData.getString("scope");
+            source = formData.getString("source");
+            // ^Can also use req.bindJSON(this, formData);
+            //  (easier when there are many fields; need set* methods for this, like setUseFrench)
+            save();
+            return super.configure(req,formData);
+        }
+
+        /**
+         * Populate the credentials dropdown box
+         * @return A ListBoxModel containing all global credentials
+         */
+        public ListBoxModel doFillCredentialsIdItems() {
+            return new StandardListBoxModel()
+                    .withEmptySelection()
+                    .withMatching(
+                            CredentialsMatchers.allOf(CredentialsMatchers.instanceOf(StandardUsernamePasswordCredentials.class)),
+                            CredentialsProvider.lookupCredentials(StandardCredentials.class,
+                                    Jenkins.getInstance(),
+                                    ACL.SYSTEM,
+                                    Collections.emptyList())
+                    );
+        }
+
+    }
+
+    /**
+     * Helper method to return credentials by id
+     * @param id The credentials id
+     * @return A UsernamePasswordCredential object that encapsulates usernames and passwords
+     */
+    public static UsernamePasswordCredentials getCredentialsById(String id) {
+        return CredentialsMatchers.firstOrNull(
+                CredentialsProvider.lookupCredentials(UsernamePasswordCredentials.class,
+                        Jenkins.getInstance(),
+                        ACL.SYSTEM,
+                        Collections.emptyList()), CredentialsMatchers.withId(id));
+    }
+
+}
+
