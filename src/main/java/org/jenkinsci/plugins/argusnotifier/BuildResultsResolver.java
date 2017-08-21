@@ -59,10 +59,6 @@ public class BuildResultsResolver {
     }
 
     public static Double translateResultToNumber(Result result) {
-        String resultToReturn = UNKNOWN;
-        if (result != null) {
-            resultToReturn = result.toString();
-        }
-        return BUILD_STATUS_MAPPING.get(resultToReturn);
+        return BUILD_STATUS_MAPPING.get(getResultString(result));
     }
 }
