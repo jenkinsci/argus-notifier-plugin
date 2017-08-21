@@ -61,9 +61,6 @@ public class ArgusNotifier extends Notifier {
     public ArgusNotifier() {
     }
 
-    /**
-     * @inheritDoc
-     */
     @Override
     public boolean perform(AbstractBuild<?,?> build, Launcher launcher, BuildListener listener) throws IOException, InterruptedException {
         OffsetDateTime now = OffsetDateTime.now();

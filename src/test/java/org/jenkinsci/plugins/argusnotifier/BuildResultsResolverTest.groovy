@@ -71,9 +71,26 @@ class BuildResultsResolverTest extends Specification {
         input            | expectedNumber
         Result.FAILURE   | 2.0
         Result.UNSTABLE  | 1.0
+        null             | 0.5
         Result.SUCCESS   | 0.0
         Result.NOT_BUILT | -0.5
         Result.ABORTED   | -1.0
-        null             | null
+    }
+
+    def '#input generates #expected resultsString'() {
+        when:
+        String resultsString = BuildResultsResolver.getResultString(input)
+
+        then:
+        resultsString == expected
+
+        where:
+        input            | expected
+        Result.FAILURE   | Result.FAILURE.toString()
+        Result.UNSTABLE  | Result.UNSTABLE.toString()
+        null             | BuildResultsResolver.UNKNOWN
+        Result.SUCCESS   | Result.SUCCESS.toString()
+        Result.NOT_BUILT | Result.NOT_BUILT.toString()
+        Result.ABORTED   | Result.ABORTED.toString()
     }
 }

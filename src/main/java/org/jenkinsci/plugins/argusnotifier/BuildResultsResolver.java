@@ -49,13 +49,11 @@ public class BuildResultsResolver {
     }
 
     public static String getResultString(Result buildResult) {
-        String buildResultString;
         if (buildResult == null) {
-            buildResultString = UNKNOWN;
+            return UNKNOWN;
         } else {
-            buildResultString = buildResult.toString();
+            return buildResult.toString();
         }
-        return buildResultString;
     }
 
     public static Double translateResultToNumber(Result result) {
