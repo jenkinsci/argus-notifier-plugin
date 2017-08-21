@@ -19,7 +19,10 @@ import hudson.model.AbstractProject;
 import hudson.model.BuildListener;
 import hudson.model.Result;
 import hudson.security.ACL;
-import hudson.tasks.*;
+import hudson.tasks.BuildStepDescriptor;
+import hudson.tasks.BuildStepMonitor;
+import hudson.tasks.Notifier;
+import hudson.tasks.Publisher;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 import hudson.util.Secret;
@@ -51,11 +54,16 @@ import java.util.Map;
  */
 public class ArgusNotifier extends Notifier {
 
+    private static final String BUILD_ANNOTATION_TYPE = "BUILD";
+
     // Fields in config.jelly must match the parameter names in the "DataBoundConstructor"
     @DataBoundConstructor
     public ArgusNotifier() {
     }
 
+    /**
+     * @inheritDoc
+     */
     @Override
     public boolean perform(AbstractBuild<?,?> build, Launcher launcher, BuildListener listener) throws IOException, InterruptedException {
         OffsetDateTime now = OffsetDateTime.now();
@@ -70,7 +78,8 @@ public class ArgusNotifier extends Notifier {
         String rootUrl;
         if (jenkins == null) {
             listener.getLogger().println("Argus Notifier: Could not talk to Jenkins. Skipping...");
-            return false;
+            // TODO: Consider adding configurable option to fail build
+            return true;
         } else {
             rootUrl = jenkins.getRootUrl();
         }
@@ -81,19 +90,19 @@ public class ArgusNotifier extends Notifier {
         metric.setScope(scope);
         metric.setDisplayName(projectName);
         metric.setMetric(projectName);
-        Map<String, String> tags =
-                ImmutableMap.<String, String>builder()
-                        .put("type", "buildstatus")
-                        .put("host", jenkins.getRootUrl())
-                        // TODO: add another tag for actual status and change value to 1?
-                        .build();
 
-        metric.setTags(tags);
         Result result = build.getResult();
         if (build.getResult() == null) {
             listener.getLogger().println("Argus Notifier: Could not determine result. Skipping...");
-            return false;
+            // TODO: Consider adding configurable option to fail build
+            return true;
         }
+
+        Map<String, String> tags =
+                TagFactory.buildStatusTags(jenkins.getRootUrl(),
+                        projectName,
+                        BuildResultsResolver.getResultString(build.getResult()));
+        metric.setTags(tags);
         Map<Long, Double> datapoints =
                 ImmutableMap.<Long, Double>builder()
                         .put(now.toEpochSecond(), BuildResultsResolver.translateResultToNumber(result))
@@ -105,7 +114,7 @@ public class ArgusNotifier extends Notifier {
         annotation.setTimestamp(now.toEpochSecond());
         annotation.setId(projectName + String.valueOf(now.toEpochSecond()));
         annotation.setSource(source);
-        annotation.setType("ALERT"); //TODO: different value?
+        annotation.setType(BUILD_ANNOTATION_TYPE);
         annotation.setMetric(projectName);
         annotation.setTags(tags);
         Map<String, String> fields =

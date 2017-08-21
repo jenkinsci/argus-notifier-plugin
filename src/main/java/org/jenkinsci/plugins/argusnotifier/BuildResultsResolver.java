@@ -12,6 +12,10 @@ import java.util.Map;
  */
 public class BuildResultsResolver {
 
+    private BuildResultsResolver() {
+        // No need for instantiation
+    }
+
     private static final Map<String, Double> BUILD_STATUS_MAPPING =
             ImmutableMap.<String, Double>builder()
                     .put(Result.ABORTED.toString(), -1.0)
@@ -41,6 +45,10 @@ public class BuildResultsResolver {
                 return STILL_FAILING;
             }
         }
+        return getResultString(buildResult);
+    }
+
+    public static String getResultString(Result buildResult) {
         String buildResultString;
         if (buildResult == null) {
             buildResultString = UNKNOWN;
