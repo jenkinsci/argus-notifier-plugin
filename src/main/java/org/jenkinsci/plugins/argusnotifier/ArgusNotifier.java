@@ -28,6 +28,7 @@ import hudson.util.ListBoxModel;
 import hudson.util.Secret;
 import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
+import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
@@ -61,6 +62,15 @@ public class ArgusNotifier extends Notifier {
     public ArgusNotifier() {
     }
 
+    /**
+     * Return true to ensure that we run <b>after</b> the build has been finalized (as the method suggests).
+     * @return
+     */
+    @Override
+    public boolean needsToRunAfterFinalized() {
+        return true;
+    }
+
     @Override
     public boolean perform(AbstractBuild<?,?> build, Launcher launcher, BuildListener listener) throws IOException, InterruptedException {
         OffsetDateTime now = OffsetDateTime.now();
@@ -68,7 +78,7 @@ public class ArgusNotifier extends Notifier {
         String credentialsId = getDescriptor().credentialsId;
         String scope = getDescriptor().scope;
         String source = getDescriptor().source;
-        String projectName = build.getProject().getName();
+        String projectName = build.getParent().getName();
         String contextualResult = BuildResultsResolver.getContextualResult(build);
 
         Jenkins jenkins = Jenkins.getInstance();
@@ -166,12 +176,8 @@ public class ArgusNotifier extends Notifier {
     /**
      * Descriptor for {@link ArgusNotifier}. Used as a singleton.
      * The class is marked as public so that it can be accessed from views.
-     *
-     * TODO: is this section helpful?
-     * <p>
-     * See {@code src/main/resources/hudson/plugins/hello_world/ArgusNotifier/*.jelly}
-     * for the actual HTML fragment for the configuration screen.
      */
+    @Symbol("argusNotifier")
     @Extension // This indicates to Jenkins that this is an implementation of an extension point.
     public static final class DescriptorImpl extends BuildStepDescriptor<Publisher> {
         /**
