@@ -1,5 +1,5 @@
 # Argus Notifier
-This Jenkins plugin sends build status and build time to an Argus endpoint.
+This Jenkins plugin sends build status and build time to an [Argus](https://github.com/salesforce/Argus) endpoint.
 
 
 ## Build
