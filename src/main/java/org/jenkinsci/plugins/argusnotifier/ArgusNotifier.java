@@ -56,6 +56,10 @@ import java.util.Map;
 public class ArgusNotifier extends Notifier {
 
     private static final String BUILD_ANNOTATION_TYPE = "BUILD";
+    public static final String BUILD_STATUS = "build.status";
+    public static final String BUILD_STATUS_LABEL = "Build Status";
+    public static final String BUILD_NUMBER_LABEL = "Build Number";
+    public static final String URL_LABEL = "URL";
 
     // Fields in config.jelly must match the parameter names in the "DataBoundConstructor"
     @DataBoundConstructor
@@ -95,8 +99,8 @@ public class ArgusNotifier extends Notifier {
 
         Metric metric = new Metric();
         metric.setScope(scope);
-        metric.setDisplayName(projectName);
-        metric.setMetric(projectName);
+        metric.setDisplayName(BUILD_STATUS_LABEL);
+        metric.setMetric(BUILD_STATUS);
 
         Result result = build.getResult();
         if (build.getResult() == null) {
@@ -107,8 +111,7 @@ public class ArgusNotifier extends Notifier {
 
         Map<String, String> tags =
                 TagFactory.buildStatusTags(jenkins.getRootUrl(),
-                        projectName,
-                        BuildResultsResolver.getResultString(build.getResult()));
+                        projectName);
         metric.setTags(tags);
         Map<Long, Double> datapoints =
                 ImmutableMap.<Long, Double>builder()
@@ -122,13 +125,13 @@ public class ArgusNotifier extends Notifier {
         annotation.setId(projectName + String.valueOf(now.toEpochSecond()));
         annotation.setSource(source);
         annotation.setType(BUILD_ANNOTATION_TYPE);
-        annotation.setMetric(projectName);
+        annotation.setMetric(BUILD_STATUS);
         annotation.setTags(tags);
         Map<String, String> fields =
                 ImmutableMap.<String, String>builder()
-                        .put("Build Result", contextualResult)
-                        .put("Build Number", String.valueOf(build.getNumber()))
-                        .put("URL", url)
+                        .put(BUILD_STATUS_LABEL, contextualResult)
+                        .put(BUILD_NUMBER_LABEL, String.valueOf(build.getNumber()))
+                        .put(URL_LABEL, url)
                         .build();
         annotation.setFields(fields);
 

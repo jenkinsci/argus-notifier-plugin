@@ -29,12 +29,10 @@ class TagFactory {
      * @param buildStatus
      * @return
      */
-    static Map<String, String> buildStatusTags(String rootUrl, String projectName, String buildStatus) {
+    static Map<String, String> buildStatusTags(String rootUrl, String projectName) {
         return ImmutableMap.<String, String>builder()
-                .put(TYPE.lower(), BUILD_STATUS.lower())
                 .put(HOST.lower(), rootUrl)
                 .put(PROJECT.lower(), projectName)
-                .put(BUILD_STATUS.lower(), buildStatus)
                 .build()
     }
 }
