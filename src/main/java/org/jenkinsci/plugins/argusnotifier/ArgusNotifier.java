@@ -123,6 +123,9 @@ public class ArgusNotifier extends Notifier {
         annotation.setScope(scope);
         annotation.setTimestamp(now.toEpochSecond());
         annotation.setId(projectName + String.valueOf(now.toEpochSecond()));
+        if (source == null || source.trim().equals("")) {
+            source = rootUrl;
+        }
         annotation.setSource(source);
         annotation.setType(BUILD_ANNOTATION_TYPE);
         annotation.setMetric(BUILD_STATUS);
@@ -136,6 +139,7 @@ public class ArgusNotifier extends Notifier {
         annotation.setFields(fields);
 
         try (
+                // TODO: URL shouldn't have a '/' at the end? Seems like a potential issue with URL forming in the SDK
                 ArgusService service = ArgusService.getInstance(argusUrl, 10)
         ) {
             UsernamePasswordCredentials credentials = getCredentialsById(credentialsId);
