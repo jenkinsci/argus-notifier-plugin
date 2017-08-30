@@ -2,3 +2,6 @@
 *.iml
 
 target
+
+# exclude work directory (hpi:run creates this)
+work
