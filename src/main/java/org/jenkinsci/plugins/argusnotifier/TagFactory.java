@@ -1,8 +1,10 @@
-package org.jenkinsci.plugins.argusnotifier
+package org.jenkinsci.plugins.argusnotifier;
 
-import com.google.common.collect.ImmutableMap
+import com.google.common.collect.ImmutableMap;
 
-import static org.jenkinsci.plugins.argusnotifier.TagFactory.Tag.*
+import java.util.Map;
+
+import static org.jenkinsci.plugins.argusnotifier.TagFactory.Tag.*;
 
 /**
  * Factory class for generating tags
@@ -14,11 +16,15 @@ class TagFactory {
         TYPE,
         HOST,
         PROJECT,
-        BUILD_STATUS
+        BUILD_STATUS;
 
-        String lower() {
-            name().toLowerCase()
+        public String lower() {
+            return name().toLowerCase();
         }
+    }
+
+    private TagFactory() {
+        // no instance necessary
     }
 
     /**
@@ -26,13 +32,12 @@ class TagFactory {
      *
      * @param rootUrl
      * @param projectName
-     * @param buildStatus
      * @return
      */
-    static Map<String, String> buildStatusTags(String rootUrl, String projectName) {
+    public static Map<String, String> buildStatusTags(String rootUrl, String projectName) {
         return ImmutableMap.<String, String>builder()
                 .put(HOST.lower(), rootUrl)
                 .put(PROJECT.lower(), projectName)
-                .build()
+                .build();
     }
 }
