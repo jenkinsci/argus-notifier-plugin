@@ -94,6 +94,7 @@ public class ArgusNotifier extends Notifier {
         } else {
             rootUrl = jenkins.getRootUrl();
         }
+        rootUrl = HostNameFormatter.getHostNameFromUrl(rootUrl);
         String url = rootUrl == null ? build.getUrl() : rootUrl + build.getUrl();
 
 
