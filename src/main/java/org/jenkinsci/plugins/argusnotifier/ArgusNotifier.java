@@ -38,6 +38,7 @@ import java.time.OffsetDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  * <p>
@@ -54,6 +55,8 @@ import java.util.Map;
  * @author Justin Harringa
  */
 public class ArgusNotifier extends Notifier {
+
+    private static final Logger logger = Logger.getLogger(ArgusNotifier.class.getName());
 
     private static final String BUILD_ANNOTATION_TYPE = "BUILD";
     public static final String BUILD_STATUS = "build.status";
@@ -88,7 +91,7 @@ public class ArgusNotifier extends Notifier {
         Jenkins jenkins = Jenkins.getInstance();
         String rootUrl;
         if (jenkins == null) {
-            listener.getLogger().println("Argus Notifier: Could not talk to Jenkins. Skipping...");
+            logger.warning("Argus Notifier: Could not talk to Jenkins. Skipping...");
             // TODO: Consider adding configurable option to fail build
             return true;
         } else {
@@ -105,7 +108,7 @@ public class ArgusNotifier extends Notifier {
 
         Result result = build.getResult();
         if (build.getResult() == null) {
-            listener.getLogger().println("Argus Notifier: Could not determine result. Skipping...");
+            logger.warning("Argus Notifier: Could not determine result. Skipping...");
             // TODO: Consider adding configurable option to fail build
             return true;
         }
@@ -158,12 +161,12 @@ public class ArgusNotifier extends Notifier {
                     .build();
             service.getAnnotationService().putAnnotations(annotations);
 
-            listener.getLogger().println("Argus Notifier: Sent message to Argus successfully!");
+            logger.info("Argus Notifier: Sent message to Argus successfully!");
             service.getAuthService().logout();
         } catch (TokenExpiredException tokenExpired) {
-            listener.getLogger().println("Token EXPIRED!!"); //TODO: do something?
+            logger.warning("Token EXPIRED!!"); //TODO: do something?
         } catch (IOException e) {
-            listener.getLogger().println("Argus Notifier: Error - " + e.getMessage());
+            logger.severe("Argus Notifier: Error - " + e.getMessage());
         }
         return true;
     }
