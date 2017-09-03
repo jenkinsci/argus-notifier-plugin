@@ -94,7 +94,7 @@ public class ArgusNotifier extends Notifier {
         } else {
             rootUrl = jenkins.getRootUrl();
         }
-        rootUrl = HostNameFormatter.getHostNameFromUrl(rootUrl);
+        String hostName = HostNameFormatter.getHostNameFromUrl(rootUrl);
         String url = rootUrl == null ? build.getUrl() : rootUrl + build.getUrl();
 
 
@@ -111,7 +111,7 @@ public class ArgusNotifier extends Notifier {
         }
 
         Map<String, String> tags =
-                TagFactory.buildStatusTags(jenkins.getRootUrl(),
+                TagFactory.buildStatusTags(hostName,
                         projectName);
         metric.setTags(tags);
         Map<Long, Double> datapoints =
@@ -220,7 +220,7 @@ public class ArgusNotifier extends Notifier {
 
         public FormValidation doCheckCredentialsId(@QueryParameter String value) {
             UsernamePasswordCredentials c = getCredentialsById(value);
-
+            // TODO: We should probably validate some of these fields
             if (c == null) {
                 return FormValidation.error("Please enter a Username with Password credentials id");
             }
