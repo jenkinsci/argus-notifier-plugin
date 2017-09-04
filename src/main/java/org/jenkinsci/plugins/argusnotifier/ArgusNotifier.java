@@ -93,7 +93,8 @@ public class ArgusNotifier extends Notifier {
             // TODO: Consider adding configurable option to fail build
             return true;
         }
-        MetricInfo metricInfo = new MetricInfo(jenkins.getRootUrl(), build, now.toEpochSecond());
+        long metricTimestamp = now.toEpochSecond();
+        JenkinsBuildFormatter jenkinsBuildFormatter = new JenkinsBuildFormatter(jenkins, build);
 
         Metric metric = new Metric();
         metric.setScope(scope);
@@ -109,21 +110,21 @@ public class ArgusNotifier extends Notifier {
         }
 
         Map<String, String> tags =
-                TagFactory.buildStatusTags(metricInfo.getHostName(),
-                        metricInfo.getProjectName());
+                TagFactory.buildStatusTags(jenkinsBuildFormatter.getHostName(),
+                        jenkinsBuildFormatter.getProjectName());
         metric.setTags(tags);
         Map<Long, Double> datapoints =
                 ImmutableMap.<Long, Double>builder()
-                        .put(metricInfo.getMetricTimestamp(), BuildResultsResolver.translateResultToNumber(result))
+                        .put(metricTimestamp, BuildResultsResolver.translateResultToNumber(result))
                         .build();
         metric.setDatapoints(datapoints);
 
         Annotation annotation = new Annotation();
         annotation.setScope(scope);
-        annotation.setTimestamp(metricInfo.getMetricTimestamp());
-        annotation.setId(projectName + metricInfo.getMetricTimestampString());
+        annotation.setTimestamp(metricTimestamp);
+        annotation.setId(projectName + String.valueOf(metricTimestamp));
         if (source == null || source.trim().equals("")) {
-            source = metricInfo.getJenkinsUrl();
+            source = jenkins.getRootUrl();
         }
         annotation.setSource(source);
         annotation.setType(BUILD_ANNOTATION_TYPE);
@@ -131,9 +132,9 @@ public class ArgusNotifier extends Notifier {
         annotation.setTags(tags);
         Map<String, String> fields =
                 ImmutableMap.<String, String>builder()
-                        .put(BUILD_STATUS_LABEL, metricInfo.getContextualResult())
-                        .put(BUILD_NUMBER_LABEL, metricInfo.getBuildNumberString())
-                        .put(URL_LABEL, metricInfo.getBuildUrl())
+                        .put(BUILD_STATUS_LABEL, jenkinsBuildFormatter.getContextualResult())
+                        .put(BUILD_NUMBER_LABEL, jenkinsBuildFormatter.getBuildNumberString())
+                        .put(URL_LABEL, jenkinsBuildFormatter.getBuildUrl())
                         .build();
         annotation.setFields(fields);
 
