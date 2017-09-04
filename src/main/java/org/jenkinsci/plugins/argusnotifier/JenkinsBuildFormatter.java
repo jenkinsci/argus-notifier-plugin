@@ -24,7 +24,10 @@ class JenkinsBuildFormatter {
      * @return project name associated with build
      */
     String getProjectName() {
-        return build.getParent().getName();
+        if (build.getParent().getFullName() == null) {
+            return "null";
+        }
+        return build.getParent().getFullName().replaceAll("/", ".");
     }
 
     /**

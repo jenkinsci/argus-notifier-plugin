@@ -1,19 +1,20 @@
 package org.jenkinsci.plugins.argusnotifier
 
-import hudson.model.AbstractBuild
-import hudson.model.Job
-import hudson.model.Result
+import hudson.model.*
 import jenkins.model.Jenkins
+import org.junit.Rule
+import org.jvnet.hudson.test.JenkinsRule
+import org.jvnet.hudson.test.MockFolder
 import spock.lang.Specification
 import spock.lang.Unroll
 
 @Unroll
 class JenkinsBuildFormatterTest extends Specification {
+    @Rule public JenkinsRule jenkinsRule = new JenkinsRule()
 
     private static final String SOMEHOST = "somehost"
     private static final GString JENKINS_URL_NO_SLASH = "https://$SOMEHOST"
     private static final String TEST_BUILD_URL = "job/test/42/"
-    private static final String TEST_PROJECT_NAME = "test"
     private AbstractBuild build = Mock(AbstractBuild)
     private Jenkins jenkins = Mock(Jenkins)
 
@@ -61,18 +62,20 @@ class JenkinsBuildFormatterTest extends Specification {
         null                     | TEST_BUILD_URL
     }
 
-    def "test getProjectName"() {
+    def "test getProjectName substitutes slashes in full name properly"() {
         given:
-        Job parentProject = Mock(Job)
-        build.getParent() >> parentProject
-        parentProject.getName() >> TEST_PROJECT_NAME
-        JenkinsBuildFormatter buildFormatter = new JenkinsBuildFormatter(jenkins, build)
+        def folderName = "myfolder"
+        MockFolder folder = jenkinsRule.createFolder(folderName)
+        def projectName = "testproject"
+        Item project = folder.createProject(FreeStyleProject, projectName)
+        FreeStyleBuild freeStyleBuild = project.scheduleBuild2(0).get()
+        JenkinsBuildFormatter buildFormatter = new JenkinsBuildFormatter(jenkins, freeStyleBuild)
 
         when:
         String actualProjectName = buildFormatter.getProjectName()
 
         then:
-        actualProjectName == TEST_PROJECT_NAME
+        actualProjectName == "$folderName.$projectName"
     }
 
     def "test getBuildNumberString"() {

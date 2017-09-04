@@ -31,7 +31,7 @@ class AnnotationFactoryTest extends Specification {
                 new AnnotationFactory(jenkins, build, 1L, "scope", actualSource)
 
         when:
-        Annotation buildStatusAnnotation = annotationFactory.getBuildStatusAnnotation()
+        Annotation buildStatusAnnotation = annotationFactory.getAnnotationFor()
 
         then:
         buildStatusAnnotation.getSource() == expectedSource

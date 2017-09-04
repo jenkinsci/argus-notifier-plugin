@@ -86,20 +86,15 @@ public class ArgusNotifier extends Notifier {
         long metricTimestamp = now.toEpochSecond();
 
         MetricFactory metricFactory = new MetricFactory(jenkins, build, metricTimestamp, scope);
-        Metric metric = metricFactory.getBuildStatusMetric();
 
-        // TODO: Send build time metric
         List<Metric> metrics =
                 ImmutableList.<Metric>builder()
-                        .add(metric)
+                        .add(metricFactory.getBuildStatusMetric())
+                        .addAll(metricFactory.getBuildTimeMetrics())
                         .build();
 
         AnnotationFactory annotationFactory = new AnnotationFactory(jenkins, build, metricTimestamp, scope, source);
-        Annotation annotation = annotationFactory.getBuildStatusAnnotation();
-
-        List<Annotation> annotations = ImmutableList.<Annotation>builder()
-                .add(annotation)
-                .build();
+        List<Annotation> annotations = annotationFactory.getAnnotationsFor(metrics);
 
         try (
                 // TODO: URL shouldn't have a '/' at the end? Seems like a potential issue with URL forming in the SDK
