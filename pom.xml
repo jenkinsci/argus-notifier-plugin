@@ -31,11 +31,14 @@
         <groovy.eclipse.batch.version>2.4.3-01</groovy.eclipse.batch.version>
         <groovy.eclipse.compiler.version>2.9.2-01</groovy.eclipse.compiler.version>
         <groovy.version>2.4.12</groovy.version>
-        <jenkins-credentials.version>1.9.4</jenkins-credentials.version>
+        <jenkins-credentials.version>2.1.5</jenkins-credentials.version>
         <maven-surefire-plugin.version>2.20</maven-surefire-plugin.version>
 
         <mockito-core.version>2.7.22</mockito-core.version>
         <maven-compiler-plugin.version>3.6.1</maven-compiler-plugin.version>
+        <metrics.version>3.1.2.9</metrics.version>
+        <structs.version>1.10</structs.version>
+        <jackson2-api.version>2.5.4</jackson2-api.version>
     </properties>
 
     <name>Argus Notifier Plugin</name>
@@ -84,7 +87,17 @@
         <dependency>
             <groupId>org.jenkins-ci.plugins</groupId>
             <artifactId>structs</artifactId>
-            <version>1.9</version>
+            <version>${structs.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jenkins-ci.plugins</groupId>
+            <artifactId>metrics</artifactId>
+            <version>${metrics.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jenkins-ci.plugins</groupId>
+            <artifactId>jackson2-api</artifactId>
+            <version>${jackson2-api.version}</version>
         </dependency>
         <dependency>
             <groupId>com.salesforce.argus</groupId>

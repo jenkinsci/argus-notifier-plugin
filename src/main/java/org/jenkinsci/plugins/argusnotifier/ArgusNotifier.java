@@ -86,25 +86,20 @@ public class ArgusNotifier extends Notifier {
         String scope = getDescriptor().scope;
         String source = getDescriptor().source;
         String projectName = build.getParent().getName();
-        String contextualResult = BuildResultsResolver.getContextualResult(build);
 
         Jenkins jenkins = Jenkins.getInstance();
-        String rootUrl;
         if (jenkins == null) {
             logger.warning("Argus Notifier: Could not talk to Jenkins. Skipping...");
             // TODO: Consider adding configurable option to fail build
             return true;
-        } else {
-            rootUrl = jenkins.getRootUrl();
         }
-        String hostName = HostNameFormatter.getHostNameFromUrl(rootUrl);
-        String url = rootUrl == null ? build.getUrl() : rootUrl + build.getUrl();
-
+        MetricInfo metricInfo = new MetricInfo(jenkins.getRootUrl(), build, now.toEpochSecond());
 
         Metric metric = new Metric();
         metric.setScope(scope);
         metric.setDisplayName(BUILD_STATUS_LABEL);
         metric.setMetric(BUILD_STATUS);
+//        metric.setNamespace(projectName);
 
         Result result = build.getResult();
         if (build.getResult() == null) {
@@ -114,21 +109,21 @@ public class ArgusNotifier extends Notifier {
         }
 
         Map<String, String> tags =
-                TagFactory.buildStatusTags(hostName,
-                        projectName);
+                TagFactory.buildStatusTags(metricInfo.getHostName(),
+                        metricInfo.getProjectName());
         metric.setTags(tags);
         Map<Long, Double> datapoints =
                 ImmutableMap.<Long, Double>builder()
-                        .put(now.toEpochSecond(), BuildResultsResolver.translateResultToNumber(result))
+                        .put(metricInfo.getMetricTimestamp(), BuildResultsResolver.translateResultToNumber(result))
                         .build();
         metric.setDatapoints(datapoints);
 
         Annotation annotation = new Annotation();
         annotation.setScope(scope);
-        annotation.setTimestamp(now.toEpochSecond());
-        annotation.setId(projectName + String.valueOf(now.toEpochSecond()));
+        annotation.setTimestamp(metricInfo.getMetricTimestamp());
+        annotation.setId(projectName + metricInfo.getMetricTimestampString());
         if (source == null || source.trim().equals("")) {
-            source = rootUrl;
+            source = metricInfo.getJenkinsUrl();
         }
         annotation.setSource(source);
         annotation.setType(BUILD_ANNOTATION_TYPE);
@@ -136,9 +131,9 @@ public class ArgusNotifier extends Notifier {
         annotation.setTags(tags);
         Map<String, String> fields =
                 ImmutableMap.<String, String>builder()
-                        .put(BUILD_STATUS_LABEL, contextualResult)
-                        .put(BUILD_NUMBER_LABEL, String.valueOf(build.getNumber()))
-                        .put(URL_LABEL, url)
+                        .put(BUILD_STATUS_LABEL, metricInfo.getContextualResult())
+                        .put(BUILD_NUMBER_LABEL, metricInfo.getBuildNumberString())
+                        .put(URL_LABEL, metricInfo.getBuildUrl())
                         .build();
         annotation.setFields(fields);
 
