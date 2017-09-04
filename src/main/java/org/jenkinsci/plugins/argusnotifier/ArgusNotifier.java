@@ -7,7 +7,6 @@ import com.cloudbees.plugins.credentials.common.StandardListBoxModel;
 import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
 import com.cloudbees.plugins.credentials.common.UsernamePasswordCredentials;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.salesforce.dva.argus.sdk.ArgusService;
 import com.salesforce.dva.argus.sdk.entity.Annotation;
 import com.salesforce.dva.argus.sdk.entity.Metric;
@@ -17,7 +16,6 @@ import hudson.Launcher;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.BuildListener;
-import hudson.model.Result;
 import hudson.security.ACL;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.BuildStepMonitor;
@@ -37,7 +35,6 @@ import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 
 /**
@@ -58,12 +55,6 @@ public class ArgusNotifier extends Notifier {
 
     private static final Logger logger = Logger.getLogger(ArgusNotifier.class.getName());
 
-    private static final String BUILD_ANNOTATION_TYPE = "BUILD";
-    public static final String BUILD_STATUS = "build.status";
-    public static final String BUILD_STATUS_LABEL = "Build Status";
-    public static final String BUILD_NUMBER_LABEL = "Build Number";
-    public static final String URL_LABEL = "URL";
-
     // Fields in config.jelly must match the parameter names in the "DataBoundConstructor"
     @DataBoundConstructor
     public ArgusNotifier() {
@@ -71,7 +62,7 @@ public class ArgusNotifier extends Notifier {
 
     /**
      * Return true to ensure that we run <b>after</b> the build has been finalized (as the method suggests).
-     * @return
+     * @return true
      */
     @Override
     public boolean needsToRunAfterFinalized() {
@@ -85,7 +76,6 @@ public class ArgusNotifier extends Notifier {
         String credentialsId = getDescriptor().credentialsId;
         String scope = getDescriptor().scope;
         String source = getDescriptor().source;
-        String projectName = build.getParent().getName();
 
         Jenkins jenkins = Jenkins.getInstance();
         if (jenkins == null) {
@@ -94,49 +84,22 @@ public class ArgusNotifier extends Notifier {
             return true;
         }
         long metricTimestamp = now.toEpochSecond();
-        JenkinsBuildFormatter jenkinsBuildFormatter = new JenkinsBuildFormatter(jenkins, build);
 
-        Metric metric = new Metric();
-        metric.setScope(scope);
-        metric.setDisplayName(BUILD_STATUS_LABEL);
-        metric.setMetric(BUILD_STATUS);
-//        metric.setNamespace(projectName);
+        MetricFactory metricFactory = new MetricFactory(jenkins, build, metricTimestamp, scope);
+        Metric metric = metricFactory.getBuildStatusMetric();
 
-        Result result = build.getResult();
-        if (build.getResult() == null) {
-            logger.warning("Argus Notifier: Could not determine result. Skipping...");
-            // TODO: Consider adding configurable option to fail build
-            return true;
-        }
-
-        Map<String, String> tags =
-                TagFactory.buildStatusTags(jenkinsBuildFormatter.getHostName(),
-                        jenkinsBuildFormatter.getProjectName());
-        metric.setTags(tags);
-        Map<Long, Double> datapoints =
-                ImmutableMap.<Long, Double>builder()
-                        .put(metricTimestamp, BuildResultsResolver.translateResultToNumber(result))
+        // TODO: Send build time metric
+        List<Metric> metrics =
+                ImmutableList.<Metric>builder()
+                        .add(metric)
                         .build();
-        metric.setDatapoints(datapoints);
 
-        Annotation annotation = new Annotation();
-        annotation.setScope(scope);
-        annotation.setTimestamp(metricTimestamp);
-        annotation.setId(projectName + String.valueOf(metricTimestamp));
-        if (source == null || source.trim().equals("")) {
-            source = jenkins.getRootUrl();
-        }
-        annotation.setSource(source);
-        annotation.setType(BUILD_ANNOTATION_TYPE);
-        annotation.setMetric(BUILD_STATUS);
-        annotation.setTags(tags);
-        Map<String, String> fields =
-                ImmutableMap.<String, String>builder()
-                        .put(BUILD_STATUS_LABEL, jenkinsBuildFormatter.getContextualResult())
-                        .put(BUILD_NUMBER_LABEL, jenkinsBuildFormatter.getBuildNumberString())
-                        .put(URL_LABEL, jenkinsBuildFormatter.getBuildUrl())
-                        .build();
-        annotation.setFields(fields);
+        AnnotationFactory annotationFactory = new AnnotationFactory(jenkins, build, metricTimestamp, scope, source);
+        Annotation annotation = annotationFactory.getBuildStatusAnnotation();
+
+        List<Annotation> annotations = ImmutableList.<Annotation>builder()
+                .add(annotation)
+                .build();
 
         try (
                 // TODO: URL shouldn't have a '/' at the end? Seems like a potential issue with URL forming in the SDK
@@ -144,17 +107,9 @@ public class ArgusNotifier extends Notifier {
         ) {
             UsernamePasswordCredentials credentials = getCredentialsById(credentialsId);
             service.getAuthService().login(credentials.getUsername(), credentials.getPassword().getPlainText());
-            List<Metric> metrics =
-                    ImmutableList.<Metric>builder()
-                            .add(metric)
-                            .build();
 
-            // TODO: Send build time metric
             service.getMetricService().putMetrics(metrics);
 
-            List<Annotation> annotations = ImmutableList.<Annotation>builder()
-                    .add(annotation)
-                    .build();
             service.getAnnotationService().putAnnotations(annotations);
 
             logger.info("Argus Notifier: Sent message to Argus successfully!");
@@ -282,7 +237,7 @@ public class ArgusNotifier extends Notifier {
      * @param id The credentials id
      * @return A UsernamePasswordCredential object that encapsulates usernames and passwords
      */
-    public static UsernamePasswordCredentials getCredentialsById(String id) {
+    static UsernamePasswordCredentials getCredentialsById(String id) {
         return CredentialsMatchers.firstOrNull(
                 CredentialsProvider.lookupCredentials(UsernamePasswordCredentials.class,
                         Jenkins.getInstance(),

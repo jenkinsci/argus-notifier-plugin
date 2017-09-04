@@ -6,7 +6,7 @@ import jenkins.model.Jenkins;
 import javax.annotation.Nonnull;
 
 /**
- * Formatter to consistently format Jenkins and Jenkins build information
+ * Formatter to consistently format Jenkins and Jenkins build info
  */
 class JenkinsBuildFormatter {
     

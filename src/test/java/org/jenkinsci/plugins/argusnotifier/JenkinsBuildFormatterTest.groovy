@@ -19,9 +19,6 @@ class JenkinsBuildFormatterTest extends Specification {
 
     def setup() {
         build.getResult() >> Result.SUCCESS
-        Job parentProject = Mock(Job)
-        build.getParent() >> parentProject
-        parentProject.getName() >> TEST_PROJECT_NAME
     }
 
 
@@ -66,6 +63,9 @@ class JenkinsBuildFormatterTest extends Specification {
 
     def "test getProjectName"() {
         given:
+        Job parentProject = Mock(Job)
+        build.getParent() >> parentProject
+        parentProject.getName() >> TEST_PROJECT_NAME
         JenkinsBuildFormatter buildFormatter = new JenkinsBuildFormatter(jenkins, build)
 
         when:
