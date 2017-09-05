@@ -42,7 +42,8 @@
     </properties>
 
     <name>Argus Notifier Plugin</name>
-    <description>This plugin is used to send</description>
+    <description>The Argus Notifier plugin allows administrators to send build metrics to an
+        [Argus|https://github.com/salesforce/Argus] server.</description>
     <url>https://wiki.jenkins-ci.org/display/JENKINS/Argus+Notifier+Plugin</url>
 
     <licenses>
@@ -54,7 +55,7 @@
 
     <developers>
         <developer>
-            <id>jharringa</id>
+            <id>justinharringa</id>
             <name>Justin Harringa</name>
             <email>jharringa@salesforce.com</email>
         </developer>
