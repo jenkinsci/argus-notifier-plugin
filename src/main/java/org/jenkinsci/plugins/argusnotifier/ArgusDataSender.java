@@ -5,6 +5,7 @@ import com.salesforce.dva.argus.sdk.ArgusService;
 import com.salesforce.dva.argus.sdk.entity.Annotation;
 import com.salesforce.dva.argus.sdk.entity.Metric;
 import com.salesforce.dva.argus.sdk.excpetions.TokenExpiredException;
+import hudson.util.Secret;
 
 import java.util.List;
 import java.util.logging.Level;
@@ -38,7 +39,7 @@ class ArgusDataSender {
         try (
                 ArgusService service = ArgusService.getInstance(argusUrl, 1)
         ) {
-            service.getAuthService().login(credentials.getUsername(), credentials.getPassword().getPlainText());
+            service.getAuthService().login(credentials.getUsername(), Secret.toString(credentials.getPassword()));
 
             service.getMetricService().putMetrics(metrics);
 

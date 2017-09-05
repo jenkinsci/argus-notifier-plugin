@@ -129,6 +129,7 @@ public class ArgusNotifier extends Notifier {
          * If you don't want fields to be persisted, use {@code transient}.
          */
         private String credentialsId, argusUrl, scope, source;
+        private boolean sendForAllBuilds;
 
         public String getCredentialsId() {
             return credentialsId;
@@ -141,6 +142,15 @@ public class ArgusNotifier extends Notifier {
         }
         public String getSource() {
             return source;
+        }
+        public boolean isSendForAllBuilds() {
+            return sendForAllBuilds;
+        }
+
+        boolean isNotifierConfigured() {
+            return credentialsId != null && !credentialsId.trim().isEmpty() &&
+                    argusUrl != null && !argusUrl.trim().isEmpty() &&
+                    scope != null && !scope.trim().isEmpty();
         }
 
         /**
@@ -162,18 +172,20 @@ public class ArgusNotifier extends Notifier {
             }
         }
 
-        public FormValidation doCheckCredentialsId(@QueryParameter String value) {
-            UsernamePasswordCredentials c = getCredentialsById(value);
-            // TODO: We should probably validate some of these fields
-            if (c == null) {
-                return FormValidation.error("Please enter a Username with Password credentials id");
-            }
+        public FormValidation doCheckCredentialsId(@QueryParameter("credentialsId") String credentialsId,
+                                                   @QueryParameter("argusUrl") String argusUrl) {
+            UsernamePasswordCredentials credToCheck = getCredentialsById(credentialsId);
+            if (credToCheck == null) {
+                if (argusUrl != null && !argusUrl.trim().isEmpty()) {
+                    return FormValidation.error("Please enter a Username with Password credentials id");
+                }
+            } else {
+                if (credToCheck.getUsername().length() == 0)
+                    return FormValidation.error("This credential should have a username");
 
-            if(c.getUsername().length() == 0)
-                return FormValidation.error("This credential should have a username");
-
-            if (Secret.toString(c.getPassword()).length() == 0) {
-                return FormValidation.error("This credential should have a password");
+                if (Secret.toString(credToCheck.getPassword()).length() == 0) {
+                    return FormValidation.error("This credential should have a password");
+                }
             }
             return FormValidation.ok();
         }
@@ -198,6 +210,7 @@ public class ArgusNotifier extends Notifier {
             argusUrl = stripTrailingSlash(formData.getString("argusUrl"));
             scope = formData.getString("scope");
             source = formData.getString("source");
+            sendForAllBuilds = formData.getBoolean("sendForAllBuilds");
             // ^Can also use req.bindJSON(this, formData);
             //  (easier when there are many fields; need set* methods for this, like setUseFrench)
             save();
