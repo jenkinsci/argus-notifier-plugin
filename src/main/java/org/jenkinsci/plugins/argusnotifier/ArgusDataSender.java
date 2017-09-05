@@ -6,7 +6,6 @@ import com.salesforce.dva.argus.sdk.entity.Annotation;
 import com.salesforce.dva.argus.sdk.entity.Metric;
 import com.salesforce.dva.argus.sdk.excpetions.TokenExpiredException;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -54,11 +53,28 @@ class ArgusDataSender {
             if (logger.isLoggable(Level.WARNING)) {
                 logger.warning("Token expired.");
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             if (logger.isLoggable(Level.SEVERE)) {
-                logger.severe("Argus Notifier: Error - " + e.getMessage());
+                logger.log(Level.SEVERE, "Argus Notifier: Error", e);
             }
         }
+    }
 
+    static boolean testConnection(String argusUrl, UsernamePasswordCredentials credentials) {
+        boolean wasSuccessful = true;
+        try (ArgusService service = ArgusService.getInstance(argusUrl, 1)) {
+            service.getAuthService().login(credentials.getUsername(), credentials.getPassword().getPlainText());
+            return true;
+        } catch (TokenExpiredException e) {
+            if (logger.isLoggable(Level.WARNING)) {
+                logger.warning("Token expired when testing connection.");
+            }
+        } catch (Exception e) {
+            wasSuccessful = false;
+            if (logger.isLoggable(Level.SEVERE)) {
+                logger.log(Level.SEVERE, "Argus Notifier: Error when testing connection", e);
+            }
+        }
+        return wasSuccessful;
     }
 }

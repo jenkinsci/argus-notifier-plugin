@@ -7,10 +7,8 @@ import com.cloudbees.plugins.credentials.common.StandardListBoxModel;
 import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
 import com.cloudbees.plugins.credentials.common.UsernamePasswordCredentials;
 import com.google.common.collect.ImmutableList;
-import com.salesforce.dva.argus.sdk.ArgusService;
 import com.salesforce.dva.argus.sdk.entity.Annotation;
 import com.salesforce.dva.argus.sdk.entity.Metric;
-import com.salesforce.dva.argus.sdk.excpetions.TokenExpiredException;
 import hudson.Extension;
 import hudson.Launcher;
 import hudson.model.AbstractBuild;
@@ -32,6 +30,7 @@ import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.time.OffsetDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -150,6 +149,17 @@ public class ArgusNotifier extends Notifier {
          */
         public DescriptorImpl() {
             load();
+        }
+
+        public FormValidation doTestConnection(@QueryParameter("argusUrl") String argusUrl,
+                                               @QueryParameter("credentialsId") String credentialsId) {
+            if (ArgusDataSender.testConnection(argusUrl, getCredentialsById(credentialsId))) {
+                return FormValidation.ok("Success!");
+            } else {
+                return FormValidation.error(
+                        MessageFormat.format("Error connecting to {0}. More details can be found in the logs.",
+                                argusUrl));
+            }
         }
 
         public FormValidation doCheckCredentialsId(@QueryParameter String value) {

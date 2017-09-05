@@ -19,6 +19,9 @@
     <f:entry title="Argus URL" field="argusUrl">
       <f:textbox />
     </f:entry>
+    <f:validateButton
+            title="${%Test Connection}" progress="${%Testing...}"
+            method="testConnection" with="argusUrl,credentialsId" />
     <f:entry title="Scope" field="scope">
       <f:textbox />
     </f:entry>
