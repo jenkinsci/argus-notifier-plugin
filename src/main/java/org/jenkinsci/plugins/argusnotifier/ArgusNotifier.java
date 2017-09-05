@@ -98,7 +98,7 @@ public class ArgusNotifier extends Notifier {
 
         try (
                 // TODO: URL shouldn't have a '/' at the end? Seems like a potential issue with URL forming in the SDK
-                ArgusService service = ArgusService.getInstance(argusUrl, 10)
+                ArgusService service = ArgusService.getInstance(argusUrl, 1)
         ) {
             UsernamePasswordCredentials credentials = getCredentialsById(credentialsId);
             service.getAuthService().login(credentials.getUsername(), credentials.getPassword().getPlainText());
@@ -200,13 +200,27 @@ public class ArgusNotifier extends Notifier {
             // To persist global configuration information,
             // set that to properties and call save().
             credentialsId = formData.getString("credentialsId");
-            argusUrl = formData.getString("argusUrl");
+            argusUrl = stripTrailingSlash(formData.getString("argusUrl"));
             scope = formData.getString("scope");
             source = formData.getString("source");
             // ^Can also use req.bindJSON(this, formData);
             //  (easier when there are many fields; need set* methods for this, like setUseFrench)
             save();
             return super.configure(req,formData);
+        }
+
+        /**
+         * There is currently a limitation in the Argus SDK where a trailing slash triggers an authentication error.
+         * This appears to be due to the way that they construct URLs. Once that is fixed, we can remove this.
+         *
+         * @param url url to strip trailing slash from
+         * @return a URL without a trailing slash
+         */
+        static String stripTrailingSlash(String url) {
+            if (url != null && url.endsWith("/")) {
+                return url.substring(0, url.lastIndexOf('/'));
+            }
+            return url;
         }
 
         /**
