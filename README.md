@@ -20,4 +20,4 @@ credentials
 To build the project with [Maven](https://maven.apache.org/), simply run `mvn clean package`
 
 ## Test
-Run `mvn clean hpi:hpi` to start up a test version of Jenkins with the requisite plugins installed.
+Run `mvn clean hpi:run` to start up a test version of Jenkins with the requisite plugins installed.

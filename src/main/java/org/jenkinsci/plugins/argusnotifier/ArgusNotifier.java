@@ -71,7 +71,6 @@ public class ArgusNotifier extends Notifier {
 
     @Override
     public boolean perform(AbstractBuild<?,?> build, Launcher launcher, BuildListener listener) throws IOException, InterruptedException {
-        OffsetDateTime now = OffsetDateTime.now();
         String argusUrl = getDescriptor().argusUrl;
         String credentialsId = getDescriptor().credentialsId;
         String scope = getDescriptor().scope;
@@ -83,6 +82,8 @@ public class ArgusNotifier extends Notifier {
             // TODO: Consider adding configurable option to fail build
             return true;
         }
+
+        OffsetDateTime now = OffsetDateTime.now();
         long metricTimestamp = now.toEpochSecond();
 
         MetricFactory metricFactory = new MetricFactory(jenkins, build, metricTimestamp, scope);
@@ -95,25 +96,9 @@ public class ArgusNotifier extends Notifier {
 
         AnnotationFactory annotationFactory = new AnnotationFactory(jenkins, build, metricTimestamp, scope, source);
         List<Annotation> annotations = annotationFactory.getAnnotationsFor(metrics);
+        UsernamePasswordCredentials credentials = getCredentialsById(credentialsId);
 
-        try (
-                // TODO: URL shouldn't have a '/' at the end? Seems like a potential issue with URL forming in the SDK
-                ArgusService service = ArgusService.getInstance(argusUrl, 1)
-        ) {
-            UsernamePasswordCredentials credentials = getCredentialsById(credentialsId);
-            service.getAuthService().login(credentials.getUsername(), credentials.getPassword().getPlainText());
-
-            service.getMetricService().putMetrics(metrics);
-
-            service.getAnnotationService().putAnnotations(annotations);
-
-            logger.info("Argus Notifier: Sent message to Argus successfully!");
-            service.getAuthService().logout();
-        } catch (TokenExpiredException tokenExpired) {
-            logger.warning("Token EXPIRED!!"); //TODO: do something?
-        } catch (IOException e) {
-            logger.severe("Argus Notifier: Error - " + e.getMessage());
-        }
+        ArgusDataSender.sendArgusData(argusUrl, credentials, metrics, annotations);
         return true;
     }
 

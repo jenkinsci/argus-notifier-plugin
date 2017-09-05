@@ -1,6 +1,7 @@
 package org.jenkinsci.plugins.argusnotifier
 
 import com.salesforce.dva.argus.sdk.entity.Annotation
+import com.salesforce.dva.argus.sdk.entity.Metric
 import hudson.model.AbstractBuild
 import hudson.model.Job
 import hudson.model.Result
@@ -31,7 +32,7 @@ class AnnotationFactoryTest extends Specification {
                 new AnnotationFactory(jenkins, build, 1L, "scope", actualSource)
 
         when:
-        Annotation buildStatusAnnotation = annotationFactory.getAnnotationFor()
+        Annotation buildStatusAnnotation = annotationFactory.getAnnotationFor(new Metric())
 
         then:
         buildStatusAnnotation.getSource() == expectedSource
@@ -48,7 +49,7 @@ class AnnotationFactoryTest extends Specification {
                 new AnnotationFactory(jenkins, build, 1L, "scope", "source")
 
         when:
-        Annotation buildStatusAnnotation = annotationFactory.buildStatusAnnotation
+        Annotation buildStatusAnnotation = annotationFactory.getAnnotationFor(new Metric())
 
         then:
         buildStatusAnnotation.fields[field] == jenkinsBuildFormatter[formatterMethod]
