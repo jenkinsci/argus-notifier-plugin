@@ -163,7 +163,9 @@ public class ArgusNotifier extends Notifier {
 
         public FormValidation doTestConnection(@QueryParameter("argusUrl") String argusUrl,
                                                @QueryParameter("credentialsId") String credentialsId) {
-            if (ArgusDataSender.testConnection(argusUrl, getCredentialsById(credentialsId))) {
+            if (argusUrl == null || argusUrl.trim().isEmpty() || credentialsId == null || credentialsId.trim().isEmpty()) {
+                return FormValidation.error("Please fill in the connection details.");
+            } else if (ArgusDataSender.testConnection(argusUrl, getCredentialsById(credentialsId))) {
                 return FormValidation.ok("Success!");
             } else {
                 return FormValidation.error(

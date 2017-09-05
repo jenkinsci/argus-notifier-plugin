@@ -62,7 +62,6 @@ class ArgusDataSender {
     }
 
     static boolean testConnection(String argusUrl, UsernamePasswordCredentials credentials) {
-        boolean wasSuccessful = true;
         try (ArgusService service = ArgusService.getInstance(argusUrl, 1)) {
             service.getAuthService().login(credentials.getUsername(), credentials.getPassword().getPlainText());
             return true;
@@ -71,11 +70,10 @@ class ArgusDataSender {
                 logger.warning("Token expired when testing connection.");
             }
         } catch (Exception e) {
-            wasSuccessful = false;
             if (logger.isLoggable(Level.SEVERE)) {
                 logger.log(Level.SEVERE, "Argus Notifier: Error when testing connection", e);
             }
         }
-        return wasSuccessful;
+        return false;
     }
 }
