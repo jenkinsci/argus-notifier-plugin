@@ -36,7 +36,7 @@ class MetricFactory {
     Metric getBuildStatusMetric() {
         Metric metric = new Metric();
         metric.setScope(scope);
-        metric.setDisplayName(BUILD_STATUS_LABEL);
+        metric.setDisplayName(getDisplayName(BUILD_STATUS_LABEL));
         metric.setMetric(BUILD_STATUS);
         // TODO: metric.setNamespace(projectName);
 
@@ -58,10 +58,14 @@ class MetricFactory {
                 getBuildTimeMetric(TOTAL_BUILD_TIME_LABEL, TOTAL_BUILD_TIME_METRIC, timeInQueueAction.getTotalDurationMillis()));
     }
 
-    private Metric getBuildTimeMetric(String displayName, String metricString, long timeInMillis) {
+    String getDisplayName(String label) {
+        return jenkinsBuildFormatter.getProjectName() + ": " + label;
+    }
+
+    private Metric getBuildTimeMetric(String labelForDisplayName, String metricString, long timeInMillis) {
         Metric metric = new Metric();
         metric.setScope(scope);
-        metric.setDisplayName(displayName);
+        metric.setDisplayName(getDisplayName(labelForDisplayName));
         metric.setMetric(metricString);
         metric.setUnits("seconds");
         // TODO: metric.setNamespace(projectName);
