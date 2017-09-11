@@ -10,7 +10,7 @@ import jenkins.model.Jenkins;
 import java.util.List;
 import java.util.Map;
 
-class MetricFactory {
+class BuildMetricFactory {
 
     static final String BUILD_STATUS = "build.status";
     static final String BUILD_TIME_METRIC = "build.time";
@@ -25,8 +25,10 @@ class MetricFactory {
     private final long metricTimestamp;
     private final String scope;
     private final JenkinsBuildFormatter jenkinsBuildFormatter;
+    private final Jenkins jenkins;
 
-    MetricFactory(Jenkins jenkins, AbstractBuild build, long metricTimestamp, String scope) {
+    BuildMetricFactory(Jenkins jenkins, AbstractBuild build, long metricTimestamp, String scope) {
+        this.jenkins = jenkins;
         this.build = build;
         this.jenkinsBuildFormatter = new JenkinsBuildFormatter(jenkins, build);
         this.metricTimestamp = metricTimestamp;
@@ -40,7 +42,7 @@ class MetricFactory {
         metric.setMetric(BUILD_STATUS);
         // TODO: metric.setNamespace(projectName);
 
-        metric.setTags(TagFactory.buildStatusTags(jenkinsBuildFormatter.getHostName(),
+        metric.setTags(TagFactory.buildStatusTags(JenkinsFormatter.getHostName(jenkins),
                 jenkinsBuildFormatter.getProjectName()));
         Map<Long, Double> datapoints =
                 ImmutableMap.<Long, Double>builder()
@@ -58,7 +60,7 @@ class MetricFactory {
                 getBuildTimeMetric(TOTAL_BUILD_TIME_LABEL, TOTAL_BUILD_TIME_METRIC, timeInQueueAction.getTotalDurationMillis()));
     }
 
-    String getDisplayName(String label) {
+    private String getDisplayName(String label) {
         return jenkinsBuildFormatter.getProjectName() + ": " + label;
     }
 
@@ -71,7 +73,7 @@ class MetricFactory {
         // TODO: metric.setNamespace(projectName);
         double timeInSeconds = (double) timeInMillis / 1000.0;
 
-        metric.setTags(TagFactory.buildStatusTags(jenkinsBuildFormatter.getHostName(),
+        metric.setTags(TagFactory.buildStatusTags(JenkinsFormatter.getHostName(jenkins),
                 jenkinsBuildFormatter.getProjectName()));
         Map<Long, Double> datapoints =
                 ImmutableMap.<Long, Double>builder()

@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static org.jenkinsci.plugins.argusnotifier.MetricFactory.BUILD_STATUS_LABEL;
+import static org.jenkinsci.plugins.argusnotifier.BuildMetricFactory.BUILD_STATUS_LABEL;
 
 class AnnotationFactory {
     static final String BUILD_ANNOTATION_TYPE = "BUILD";

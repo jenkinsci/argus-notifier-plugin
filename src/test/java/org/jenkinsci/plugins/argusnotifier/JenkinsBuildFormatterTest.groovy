@@ -22,27 +22,6 @@ class JenkinsBuildFormatterTest extends Specification {
         build.getResult() >> Result.SUCCESS
     }
 
-
-    def 'hostNameFromUrl: #inputUrl should be #hostName'() {
-        given:
-        jenkins.getRootUrl() >> inputUrl
-        JenkinsBuildFormatter buildFormatter = new JenkinsBuildFormatter(jenkins, build)
-
-        when:
-        String result = buildFormatter.getHostName()
-
-        then:
-        result == hostName
-
-        where:
-        inputUrl                       | hostName
-        "https://$SOMEHOST"            | SOMEHOST
-        "http://$SOMEHOST"             | SOMEHOST
-        "$SOMEHOST:80"                 | SOMEHOST
-        "$SOMEHOST/jenkins"            | SOMEHOST
-        "https://$SOMEHOST:80/jenkins" | SOMEHOST
-    }
-
     def "formatBuildUrl=#expectedUrl where jenkinsUrl=#jenkinsUrl"() {
         given:
         jenkins.getRootUrl() >> jenkinsUrl

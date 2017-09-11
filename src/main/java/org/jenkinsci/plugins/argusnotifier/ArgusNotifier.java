@@ -85,12 +85,12 @@ public class ArgusNotifier extends Notifier {
         OffsetDateTime now = OffsetDateTime.now();
         long metricTimestamp = now.toEpochSecond();
 
-        MetricFactory metricFactory = new MetricFactory(jenkins, build, metricTimestamp, scope);
+        BuildMetricFactory buildMetricFactory = new BuildMetricFactory(jenkins, build, metricTimestamp, scope);
 
         List<Metric> metrics =
                 ImmutableList.<Metric>builder()
-                        .add(metricFactory.getBuildStatusMetric())
-                        .addAll(metricFactory.getBuildTimeMetrics())
+                        .add(buildMetricFactory.getBuildStatusMetric())
+                        .addAll(buildMetricFactory.getBuildTimeMetrics())
                         .build();
 
         AnnotationFactory annotationFactory = new AnnotationFactory(jenkins, build, metricTimestamp, scope, source);

@@ -52,12 +52,12 @@ public class ArgusBuildListener extends RunListener<AbstractBuild> {
                 String scope = argusNotifierDescriptor.getScope();
                 String source = argusNotifierDescriptor.getSource();
 
-                MetricFactory metricFactory = new MetricFactory(instance, build, metricTimestamp, scope);
+                BuildMetricFactory buildMetricFactory = new BuildMetricFactory(instance, build, metricTimestamp, scope);
 
                 List<Metric> metrics =
                         ImmutableList.<Metric>builder()
-                                .add(metricFactory.getBuildStatusMetric())
-                                .addAll(metricFactory.getBuildTimeMetrics())
+                                .add(buildMetricFactory.getBuildStatusMetric())
+                                .addAll(buildMetricFactory.getBuildTimeMetrics())
                                 .build();
 
                 AnnotationFactory annotationFactory = new AnnotationFactory(instance, build, metricTimestamp, scope, source);

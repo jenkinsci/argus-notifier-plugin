@@ -55,9 +55,9 @@ class AnnotationFactoryTest extends Specification {
         buildStatusAnnotation.fields[field] == jenkinsBuildFormatter[formatterMethod]
 
         where:
-        field                                | formatterMethod
-        MetricFactory.BUILD_STATUS_LABEL     | "contextualResult"
-        AnnotationFactory.BUILD_NUMBER_LABEL | "buildNumberString"
-        AnnotationFactory.URL_LABEL          | "buildUrl"
+        field                                 | formatterMethod
+        BuildMetricFactory.BUILD_STATUS_LABEL | "contextualResult"
+        AnnotationFactory.BUILD_NUMBER_LABEL  | "buildNumberString"
+        AnnotationFactory.URL_LABEL           | "buildUrl"
     }
 }
