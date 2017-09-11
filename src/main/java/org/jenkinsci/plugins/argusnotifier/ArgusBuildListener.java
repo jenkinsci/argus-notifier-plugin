@@ -14,6 +14,7 @@ import javax.annotation.Nonnull;
 import java.text.MessageFormat;
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -36,8 +37,9 @@ public class ArgusBuildListener extends RunListener<AbstractBuild> {
      */
     @Override
     public void onCompleted(AbstractBuild build, @Nonnull TaskListener listener) {
-        Jenkins instance = Jenkins.getInstance();
-        if (instance != null) {
+        final Optional<Jenkins> optionalInstance = JenkinsOptionalConverter.getOptionalInstance(logger);
+        if (optionalInstance.isPresent()) {
+            Jenkins instance = optionalInstance.get();
             ArgusNotifier.DescriptorImpl argusNotifierDescriptor =
                     (ArgusNotifier.DescriptorImpl) instance.getDescriptor(ArgusNotifier.class);
             if (argusNotifierDescriptor.isNotifierConfigured() && argusNotifierDescriptor.isSendForAllBuilds()) {
@@ -67,10 +69,6 @@ public class ArgusBuildListener extends RunListener<AbstractBuild> {
                             credentials.getUsername()));
                 }
                 ArgusDataSender.sendArgusData(argusUrl, credentials, metrics, annotations);
-            }
-        } else {
-            if (logger.isLoggable(Level.WARNING)) {
-                logger.warning("Jenkins.instance was null. Skipping...");
             }
         }
     }
