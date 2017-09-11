@@ -21,3 +21,7 @@ To build the project with [Maven](https://maven.apache.org/), simply run `mvn cl
 
 ## Test
 Run `mvn clean hpi:run` to start up a test version of Jenkins with the requisite plugins installed.
+
+## Releasing
+Run `mvn release:prepare release:perform` but ensure that your Maven `settings.xml` has been 
+[set up with your Artifactory password](https://wiki.jenkins.io/display/JENKINS/Hosting+Plugins#HostingPlugins-Releasingtojenkins-ci.org)
