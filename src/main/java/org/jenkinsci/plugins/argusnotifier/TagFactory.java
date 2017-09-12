@@ -13,10 +13,8 @@ import static org.jenkinsci.plugins.argusnotifier.TagFactory.Tag.*;
  */
 class TagFactory {
     enum Tag {
-        TYPE,
         HOST,
-        PROJECT,
-        BUILD_STATUS;
+        PROJECT;
 
         public String lower() {
             return name().toLowerCase();
@@ -34,7 +32,7 @@ class TagFactory {
      * @param projectName
      * @return
      */
-    public static Map<String, String> buildStatusTags(String rootUrl, String projectName) {
+    static Map<String, String> buildStatusTags(String rootUrl, String projectName) {
         return ImmutableMap.<String, String>builder()
                 .put(HOST.lower(), rootUrl)
                 .put(PROJECT.lower(), projectName)
