@@ -1,6 +1,7 @@
 package org.jenkinsci.plugins.argusnotifier;
 
 import hudson.model.AbstractBuild;
+import hudson.model.Run;
 import jenkins.model.Jenkins;
 
 import javax.annotation.Nonnull;
@@ -8,14 +9,14 @@ import javax.annotation.Nonnull;
 /**
  * Formatter to consistently format Jenkins and Jenkins build info
  */
-class JenkinsBuildFormatter {
+class JenkinsRunFormatter {
     
     private final String jenkinsUrl;
-    private final AbstractBuild build;
+    private final Run run;
 
-    public JenkinsBuildFormatter(@Nonnull Jenkins jenkins, @Nonnull AbstractBuild build) {
+    public JenkinsRunFormatter(@Nonnull Jenkins jenkins, @Nonnull Run run) {
         this.jenkinsUrl = jenkins.getRootUrl();
-        this.build = build;
+        this.run = run;
     }
 
     /**
@@ -24,26 +25,26 @@ class JenkinsBuildFormatter {
      * @return project name associated with build
      */
     String getProjectName() {
-        if (build.getParent().getFullName() == null) {
+        if (run.getParent().getFullName() == null) {
             return "null";
         }
-        return build.getParent().getFullName().replaceAll("/", ".");
+        return run.getParent().getFullName().replaceAll("/", ".");
     }
 
     /**
      * Will return either just the build URL "job/test/42/" if the Jenkins URL is null or
      * a full build URL.
      *
-     * @return full build URL if possible
+     * @return full run URL if possible
      */
-     String getBuildUrl() {
+     String getRunUrl() {
         if (jenkinsUrl == null) {
-            return build.getUrl();
+            return run.getUrl();
         }
         if (jenkinsUrl.substring(jenkinsUrl.length() - 1, jenkinsUrl.length()).equals("/")) {
-            return jenkinsUrl + build.getUrl();
+            return jenkinsUrl + run.getUrl();
         }
-        return jenkinsUrl + '/' + build.getUrl();
+        return jenkinsUrl + '/' + run.getUrl();
     }
 
     /**
@@ -52,7 +53,7 @@ class JenkinsBuildFormatter {
      * @return build.number as String
      */
     public String getBuildNumberString() {
-        return String.valueOf(build.getNumber());
+        return String.valueOf(run.getNumber());
     }
 
     /**
@@ -61,6 +62,6 @@ class JenkinsBuildFormatter {
      * @return contextual build result (e.g. FIXED, STILL FAILING)
      */
     public String getContextualResult() {
-        return BuildResultsResolver.getContextualResult(build);
+        return BuildResultsResolver.getContextualResult(run);
     }
 }

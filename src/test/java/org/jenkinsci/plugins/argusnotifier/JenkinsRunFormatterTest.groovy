@@ -9,7 +9,7 @@ import spock.lang.Specification
 import spock.lang.Unroll
 
 @Unroll
-class JenkinsBuildFormatterTest extends Specification {
+class JenkinsRunFormatterTest extends Specification {
     @Rule public JenkinsRule jenkinsRule = new JenkinsRule()
 
     private static final String SOMEHOST = "somehost"
@@ -26,10 +26,10 @@ class JenkinsBuildFormatterTest extends Specification {
         given:
         jenkins.getRootUrl() >> jenkinsUrl
         build.getUrl() >>  TEST_BUILD_URL
-        JenkinsBuildFormatter buildFormatter = new JenkinsBuildFormatter(jenkins, build)
+        JenkinsRunFormatter buildFormatter = new JenkinsRunFormatter(jenkins, build)
 
         when:
-        String formattedBuildUrl = buildFormatter.getBuildUrl()
+        String formattedBuildUrl = buildFormatter.getRunUrl()
 
         then:
         formattedBuildUrl == expectedUrl
@@ -48,7 +48,7 @@ class JenkinsBuildFormatterTest extends Specification {
         def projectName = "testproject"
         Item project = folder.createProject(FreeStyleProject, projectName)
         FreeStyleBuild freeStyleBuild = project.scheduleBuild2(0).get()
-        JenkinsBuildFormatter buildFormatter = new JenkinsBuildFormatter(jenkins, freeStyleBuild)
+        JenkinsRunFormatter buildFormatter = new JenkinsRunFormatter(jenkins, freeStyleBuild)
 
         when:
         String actualProjectName = buildFormatter.getProjectName()
@@ -61,7 +61,7 @@ class JenkinsBuildFormatterTest extends Specification {
         given:
         def buildNumber = 42
         build.getNumber() >> buildNumber
-        JenkinsBuildFormatter jenkinsBuildFormatter = new JenkinsBuildFormatter(jenkins, build)
+        JenkinsRunFormatter jenkinsBuildFormatter = new JenkinsRunFormatter(jenkins, build)
 
         when:
         String actualBuildNumberString = jenkinsBuildFormatter.getBuildNumberString()
@@ -76,7 +76,7 @@ class JenkinsBuildFormatterTest extends Specification {
         AbstractBuild previousBuild = Mock(AbstractBuild)
         previousBuild.getResult() >> Result.FAILURE
         build.getPreviousBuild() >> previousBuild
-        JenkinsBuildFormatter buildFormatter = new JenkinsBuildFormatter(jenkins, build)
+        JenkinsRunFormatter buildFormatter = new JenkinsRunFormatter(jenkins, build)
 
         when:
         String actualContextualResult = buildFormatter.getContextualResult()

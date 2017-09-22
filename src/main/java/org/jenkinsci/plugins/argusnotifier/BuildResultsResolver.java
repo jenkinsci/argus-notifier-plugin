@@ -3,6 +3,7 @@ package org.jenkinsci.plugins.argusnotifier;
 import com.google.common.collect.ImmutableMap;
 import hudson.model.AbstractBuild;
 import hudson.model.Result;
+import hudson.model.Run;
 
 import javax.annotation.Nonnull;
 import java.util.Map;
@@ -29,15 +30,15 @@ public class BuildResultsResolver {
                     .put(Result.FAILURE.toString(), 2.0)
                     .build();
 
-    public static String getContextualResult(@Nonnull AbstractBuild<?,?> build) {
+    public static String getContextualResult(@Nonnull Run<?,?> run) {
 
-        AbstractBuild<?, ?> previousBuild = build.getPreviousBuild();
+        Run<?, ?> previousBuild = run.getPreviousBuild();
         Result previousBuildResult = null;
         if (previousBuild != null) {
             previousBuildResult = previousBuild.getResult();
         }
 
-        Result buildResult = build.getResult();
+        Result buildResult = run.getResult();
         if (previousBuildResult != null && previousBuildResult == Result.FAILURE) {
             if (buildResult == Result.SUCCESS) {
                 return FIXED;

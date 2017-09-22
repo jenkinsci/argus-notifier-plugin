@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.salesforce.dva.argus.sdk.entity.Annotation;
 import com.salesforce.dva.argus.sdk.entity.Metric;
-import hudson.model.AbstractBuild;
+import hudson.model.Run;
 import jenkins.model.Jenkins;
 
 import java.util.List;
@@ -20,15 +20,15 @@ class AnnotationFactory {
 
     private final long metricTimestamp;
     private final String scope;
-    private final JenkinsBuildFormatter jenkinsBuildFormatter;
+    private final JenkinsRunFormatter jenkinsRunFormatter;
     private final String source;
 
-    AnnotationFactory(Jenkins jenkins, AbstractBuild build, long metricTimestamp, String scope, String source) {
-        this.jenkinsBuildFormatter = new JenkinsBuildFormatter(jenkins, build);
+    AnnotationFactory(Jenkins jenkins, Run run, long metricTimestamp, String scope, String source) {
+        this.jenkinsRunFormatter = new JenkinsRunFormatter(jenkins, run);
         this.metricTimestamp = metricTimestamp;
         this.scope = scope;
         if (source == null || source.trim().equals("")) {
-            this.source = jenkins.getRootUrl();
+            this.source = JenkinsFormatter.getHostName(jenkins);
         } else {
             this.source = source;
         }
@@ -45,9 +45,9 @@ class AnnotationFactory {
         annotation.setTags(metric.getTags());
         Map<String, String> fields =
                 ImmutableMap.<String, String>builder()
-                        .put(BUILD_STATUS_LABEL, jenkinsBuildFormatter.getContextualResult())
-                        .put(BUILD_NUMBER_LABEL, jenkinsBuildFormatter.getBuildNumberString())
-                        .put(URL_LABEL, jenkinsBuildFormatter.getBuildUrl())
+                        .put(BUILD_STATUS_LABEL, jenkinsRunFormatter.getContextualResult())
+                        .put(BUILD_NUMBER_LABEL, jenkinsRunFormatter.getBuildNumberString())
+                        .put(URL_LABEL, jenkinsRunFormatter.getRunUrl())
                         .build();
         annotation.setFields(fields);
         return annotation;

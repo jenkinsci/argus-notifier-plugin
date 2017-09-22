@@ -13,7 +13,6 @@ import java.util.logging.Logger;
 @Extension
 public class PeriodicJenkinsMetricsSender extends AsyncPeriodicWork {
     private static final String ARGUS_NOTIFIER_PERIODIC_WORK = "Argus Notifier Periodic Sender";
-    private static final Logger logger = Logger.getLogger(PeriodicJenkinsMetricsSender.class.getName());
 
     public PeriodicJenkinsMetricsSender() {
         super(ARGUS_NOTIFIER_PERIODIC_WORK);
