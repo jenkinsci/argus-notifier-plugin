@@ -1,4 +1,4 @@
 <?jelly escape-by-default='true'?>
 <div>
-  The Argus Notifier plugin allows administrators to send build metrics to an Argus server.
+  Send build and system metrics to an Argus server.
 </div>

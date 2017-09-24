@@ -13,7 +13,7 @@
     so it should be straightforward to find them.
   -->
   <f:section title="Argus Notifier">
-    <f:entry title="Credentials Id" field="credentialsId" name="credentialsId">
+    <f:entry title="Credentials Id" field="credentialsId">
       <f:select />
     </f:entry>
     <f:entry title="Argus URL" field="argusUrl">
