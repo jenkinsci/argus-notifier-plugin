@@ -17,6 +17,9 @@ import java.util.logging.Logger;
  */
 class ArgusDataSender {
     private static final Logger logger = Logger.getLogger(ArgusDataSender.class.getName());
+    private static final String UNKNOWN_HOST_MESSAGE = "Host not found! Check your Argus server configuration in Manage Jenkins -> Configure " +
+            "System or your network configuration";
+    private static final String SEND_SUCCESS_MESSAGE = "Argus Notifier: Sent metrics/annotations to Argus successfully!";
 
     /**
      * Marked private since there is no need for an instance
@@ -49,7 +52,7 @@ class ArgusDataSender {
             }
 
             if (logger.isLoggable(Level.INFO)) {
-                logger.info("Argus Notifier: Sent message to Argus successfully!");
+                logger.info(SEND_SUCCESS_MESSAGE);
             }
             service.getAuthService().logout();
         } catch (TokenExpiredException tokenExpired) {
@@ -59,10 +62,7 @@ class ArgusDataSender {
             }
         } catch (UnknownHostException unknownHostException) {
             if (logger.isLoggable(Level.SEVERE)) {
-                logger.log(Level.SEVERE,
-                        "Host not found! Check your Argus server configuration in Manage Jenkins -> Configure " +
-                                "System or your network configuration",
-                        unknownHostException);
+                logger.log(Level.SEVERE, UNKNOWN_HOST_MESSAGE, unknownHostException);
             }
         } catch (Exception e) {
             if (logger.isLoggable(Level.SEVERE)) {
@@ -78,6 +78,10 @@ class ArgusDataSender {
         } catch (TokenExpiredException e) {
             if (logger.isLoggable(Level.WARNING)) {
                 logger.warning("Token expired when testing connection.");
+            }
+        } catch (UnknownHostException unknownHostException) {
+            if (logger.isLoggable(Level.SEVERE)) {
+                logger.log(Level.SEVERE, UNKNOWN_HOST_MESSAGE, unknownHostException);
             }
         } catch (Exception e) {
             if (logger.isLoggable(Level.SEVERE)) {
