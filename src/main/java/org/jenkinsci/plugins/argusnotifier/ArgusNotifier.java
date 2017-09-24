@@ -70,34 +70,27 @@ public class ArgusNotifier extends Notifier {
 
     @Override
     public boolean perform(AbstractBuild<?,?> build, Launcher launcher, BuildListener listener) throws IOException, InterruptedException {
-        String argusUrl = getDescriptor().argusUrl;
-        String credentialsId = getDescriptor().credentialsId;
+        ArgusConnectionInfo argusConnectionInfo = getDescriptor().getArgusConnectionInfo();
         String scope = getDescriptor().scope;
         String source = getDescriptor().source;
 
         Jenkins jenkins = Jenkins.getInstance();
-        if (jenkins == null) {
-            logger.warning("Argus Notifier: Could not talk to Jenkins. Skipping...");
-            // TODO: Consider adding configurable option to fail build
-            return true;
-        }
 
         OffsetDateTime now = OffsetDateTime.now();
         long metricTimestamp = now.toEpochSecond();
 
-        MetricFactory metricFactory = new MetricFactory(jenkins, build, metricTimestamp, scope);
+        BuildMetricFactory buildMetricFactory = new BuildMetricFactory(jenkins, build, metricTimestamp, scope);
 
         List<Metric> metrics =
                 ImmutableList.<Metric>builder()
-                        .add(metricFactory.getBuildStatusMetric())
-                        .addAll(metricFactory.getBuildTimeMetrics())
+                        .add(buildMetricFactory.getBuildStatusMetric())
+                        .addAll(buildMetricFactory.getBuildTimeMetrics())
                         .build();
 
         AnnotationFactory annotationFactory = new AnnotationFactory(jenkins, build, metricTimestamp, scope, source);
         List<Annotation> annotations = annotationFactory.getAnnotationsFor(metrics);
-        UsernamePasswordCredentials credentials = getCredentialsById(credentialsId);
 
-        ArgusDataSender.sendArgusData(argusUrl, credentials, metrics, annotations);
+        ArgusDataSender.sendArgusData(argusConnectionInfo, metrics, annotations);
         return true;
     }
 
@@ -129,7 +122,7 @@ public class ArgusNotifier extends Notifier {
          * If you don't want fields to be persisted, use {@code transient}.
          */
         private String credentialsId, argusUrl, scope, source;
-        private boolean sendForAllBuilds;
+        private boolean sendForAllBuilds = true, sendSystemMetrics = true;
 
         public String getCredentialsId() {
             return credentialsId;
@@ -145,6 +138,12 @@ public class ArgusNotifier extends Notifier {
         }
         public boolean isSendForAllBuilds() {
             return sendForAllBuilds;
+        }
+        public boolean isSendSystemMetrics() {
+            return sendSystemMetrics;
+        }
+        ArgusConnectionInfo getArgusConnectionInfo() {
+            return new ArgusConnectionInfo(argusUrl, getCredentialsById(getCredentialsId()));
         }
 
         boolean isNotifierConfigured() {
@@ -213,6 +212,7 @@ public class ArgusNotifier extends Notifier {
             scope = formData.getString("scope");
             source = formData.getString("source");
             sendForAllBuilds = formData.getBoolean("sendForAllBuilds");
+            sendSystemMetrics = formData.getBoolean("sendSystemMetrics");
             // ^Can also use req.bindJSON(this, formData);
             //  (easier when there are many fields; need set* methods for this, like setUseFrench)
             save();
@@ -239,7 +239,7 @@ public class ArgusNotifier extends Notifier {
          */
         public ListBoxModel doFillCredentialsIdItems() {
             return new StandardListBoxModel()
-                    .withEmptySelection()
+                    .includeEmptyValue()
                     .withMatching(
                             CredentialsMatchers.allOf(CredentialsMatchers.instanceOf(StandardUsernamePasswordCredentials.class)),
                             CredentialsProvider.lookupCredentials(StandardCredentials.class,

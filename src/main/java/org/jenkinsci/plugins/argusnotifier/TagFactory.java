@@ -1,6 +1,7 @@
 package org.jenkinsci.plugins.argusnotifier;
 
 import com.google.common.collect.ImmutableMap;
+import jenkins.model.Jenkins;
 
 import java.util.Map;
 
@@ -13,10 +14,8 @@ import static org.jenkinsci.plugins.argusnotifier.TagFactory.Tag.*;
  */
 class TagFactory {
     enum Tag {
-        TYPE,
         HOST,
-        PROJECT,
-        BUILD_STATUS;
+        PROJECT;
 
         public String lower() {
             return name().toLowerCase();
@@ -30,14 +29,20 @@ class TagFactory {
     /**
      * Create immutable map of tags for a build_status metric
      *
-     * @param rootUrl
+     * @param jenkins
      * @param projectName
      * @return
      */
-    public static Map<String, String> buildStatusTags(String rootUrl, String projectName) {
+    static Map<String, String> buildStatusTags(Jenkins jenkins, String projectName) {
         return ImmutableMap.<String, String>builder()
-                .put(HOST.lower(), rootUrl)
+                .putAll(hostTag(jenkins))
                 .put(PROJECT.lower(), projectName)
+                .build();
+    }
+
+    static Map<String, String> hostTag(Jenkins jenkins) {
+        return ImmutableMap.<String, String>builder()
+                .put(HOST.lower(), JenkinsFormatter.getHostName(jenkins))
                 .build();
     }
 }

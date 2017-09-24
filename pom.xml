@@ -15,7 +15,7 @@
 
     <properties>
         <!-- Baseline Jenkins version you use to build the plugin. Users must have this version or newer to run. -->
-        <jenkins.version>1.625.3</jenkins.version>
+        <jenkins.version>2.60</jenkins.version>
         <!-- Java Level to use. Java 7 required when using core >= 1.612 -->
         <java.level>8</java.level>
         <java.version>1.8</java.version>
@@ -42,7 +42,7 @@
     </properties>
 
     <name>Argus Notifier Plugin</name>
-    <description>The Argus Notifier plugin allows administrators to send build metrics to an
+    <description>The Argus Notifier plugin sends build and system metrics to an
         [Argus|https://github.com/salesforce/Argus] server.</description>
     <url>https://wiki.jenkins-ci.org/display/JENKINS/Argus+Notifier+Plugin</url>
 

@@ -4,13 +4,14 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.salesforce.dva.argus.sdk.entity.Metric;
 import hudson.model.AbstractBuild;
+import hudson.model.Run;
 import jenkins.metrics.impl.TimeInQueueAction;
 import jenkins.model.Jenkins;
 
 import java.util.List;
 import java.util.Map;
 
-class MetricFactory {
+class BuildMetricFactory {
 
     static final String BUILD_STATUS = "build.status";
     static final String BUILD_TIME_METRIC = "build.time";
@@ -21,14 +22,16 @@ class MetricFactory {
     static final String QUEUE_TIME_LABEL = "Queue Time";
     static final String TOTAL_BUILD_TIME_LABEL = "Total Build Time";
 
-    private final AbstractBuild build;
+    private final Run run;
     private final long metricTimestamp;
     private final String scope;
-    private final JenkinsBuildFormatter jenkinsBuildFormatter;
+    private final JenkinsRunFormatter jenkinsRunFormatter;
+    private final Jenkins jenkins;
 
-    MetricFactory(Jenkins jenkins, AbstractBuild build, long metricTimestamp, String scope) {
-        this.build = build;
-        this.jenkinsBuildFormatter = new JenkinsBuildFormatter(jenkins, build);
+    BuildMetricFactory(Jenkins jenkins, Run run, long metricTimestamp, String scope) {
+        this.jenkins = jenkins;
+        this.run = run;
+        this.jenkinsRunFormatter = new JenkinsRunFormatter(jenkins, run);
         this.metricTimestamp = metricTimestamp;
         this.scope = scope;
     }
@@ -40,26 +43,36 @@ class MetricFactory {
         metric.setMetric(BUILD_STATUS);
         // TODO: metric.setNamespace(projectName);
 
-        metric.setTags(TagFactory.buildStatusTags(jenkinsBuildFormatter.getHostName(),
-                jenkinsBuildFormatter.getProjectName()));
+        metric.setTags(TagFactory.buildStatusTags(jenkins,
+                jenkinsRunFormatter.getProjectName()));
         Map<Long, Double> datapoints =
                 ImmutableMap.<Long, Double>builder()
-                        .put(metricTimestamp, BuildResultsResolver.translateResultToNumber(build.getResult()))
+                        .put(metricTimestamp, BuildResultsResolver.translateResultToNumber(run.getResult()))
                         .build();
         metric.setDatapoints(datapoints);
         return metric;
     }
 
     List<Metric> getBuildTimeMetrics() {
-        TimeInQueueAction timeInQueueAction = build.getAction(jenkins.metrics.impl.TimeInQueueAction.class);
+        TimeInQueueAction timeInQueueAction = run.getAction(jenkins.metrics.impl.TimeInQueueAction.class);
+        long buildingDurationMillis;
+        long totalDurationMillis;
+        // Working around https://issues.jenkins-ci.org/browse/JENKINS-46945
+        if (run instanceof AbstractBuild) {
+            buildingDurationMillis = timeInQueueAction.getBuildingDurationMillis();
+            totalDurationMillis = timeInQueueAction.getTotalDurationMillis();
+        } else {
+            buildingDurationMillis = Math.max(0L, System.currentTimeMillis() - run.getStartTimeInMillis());
+            totalDurationMillis = timeInQueueAction.getQueuingDurationMillis() + buildingDurationMillis;
+        }
         return ImmutableList.of(
-                getBuildTimeMetric(BUILD_TIME_LABEL, BUILD_TIME_METRIC, timeInQueueAction.getBuildingDurationMillis()),
+                getBuildTimeMetric(BUILD_TIME_LABEL, BUILD_TIME_METRIC, buildingDurationMillis),
                 getBuildTimeMetric(QUEUE_TIME_LABEL, QUEUE_TIME_METRIC, timeInQueueAction.getQueuingDurationMillis()),
-                getBuildTimeMetric(TOTAL_BUILD_TIME_LABEL, TOTAL_BUILD_TIME_METRIC, timeInQueueAction.getTotalDurationMillis()));
+                getBuildTimeMetric(TOTAL_BUILD_TIME_LABEL, TOTAL_BUILD_TIME_METRIC, totalDurationMillis));
     }
 
-    String getDisplayName(String label) {
-        return jenkinsBuildFormatter.getProjectName() + ": " + label;
+    private String getDisplayName(String label) {
+        return jenkinsRunFormatter.getProjectName() + ": " + label;
     }
 
     private Metric getBuildTimeMetric(String labelForDisplayName, String metricString, long timeInMillis) {
@@ -71,8 +84,8 @@ class MetricFactory {
         // TODO: metric.setNamespace(projectName);
         double timeInSeconds = (double) timeInMillis / 1000.0;
 
-        metric.setTags(TagFactory.buildStatusTags(jenkinsBuildFormatter.getHostName(),
-                jenkinsBuildFormatter.getProjectName()));
+        metric.setTags(TagFactory.buildStatusTags(jenkins,
+                jenkinsRunFormatter.getProjectName()));
         Map<Long, Double> datapoints =
                 ImmutableMap.<Long, Double>builder()
                         .put(metricTimestamp, timeInSeconds)
