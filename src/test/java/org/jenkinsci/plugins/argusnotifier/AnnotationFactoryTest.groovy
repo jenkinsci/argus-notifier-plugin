@@ -59,6 +59,6 @@ class AnnotationFactoryTest extends Specification {
         field                                 | formatterMethod
         BuildMetricFactory.BUILD_STATUS_LABEL | "contextualResult"
         AnnotationFactory.BUILD_NUMBER_LABEL  | "buildNumberString"
-        AnnotationFactory.URL_LABEL           | "buildUrl"
+        AnnotationFactory.URL_LABEL           | "runUrl"
     }
 }

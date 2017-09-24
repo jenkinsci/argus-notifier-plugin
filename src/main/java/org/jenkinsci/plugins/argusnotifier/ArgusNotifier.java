@@ -76,11 +76,6 @@ public class ArgusNotifier extends Notifier {
         String source = getDescriptor().source;
 
         Jenkins jenkins = Jenkins.getInstance();
-        if (jenkins == null) {
-            logger.warning("Argus Notifier: Could not talk to Jenkins. Skipping...");
-            // TODO: Consider adding configurable option to fail build
-            return true;
-        }
 
         OffsetDateTime now = OffsetDateTime.now();
         long metricTimestamp = now.toEpochSecond();

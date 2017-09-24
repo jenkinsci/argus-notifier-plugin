@@ -37,39 +37,37 @@ public class ArgusRunListener extends RunListener<Run> {
      */
     @Override
     public void onCompleted(Run run, @Nonnull TaskListener listener) {
-        final Optional<Jenkins> optionalInstance = JenkinsOptionalConverter.getOptionalInstance(logger);
-        if (optionalInstance.isPresent()) {
-            Jenkins instance = optionalInstance.get();
-            ArgusNotifier.DescriptorImpl argusNotifierDescriptor =
-                    (ArgusNotifier.DescriptorImpl) instance.getDescriptor(ArgusNotifier.class);
-            if (argusNotifierDescriptor.isNotifierConfigured() && argusNotifierDescriptor.isSendForAllBuilds()) {
-                String credentialsId = argusNotifierDescriptor.getCredentialsId();
-                UsernamePasswordCredentials credentials = ArgusNotifier.getCredentialsById(credentialsId);
+        Jenkins instance = Jenkins.getInstance();
+        ArgusNotifier.DescriptorImpl argusNotifierDescriptor =
+                (ArgusNotifier.DescriptorImpl) instance.getDescriptor(ArgusNotifier.class);
+        if (argusNotifierDescriptor != null &&
+                argusNotifierDescriptor.isNotifierConfigured() && argusNotifierDescriptor.isSendForAllBuilds()) {
+            String credentialsId = argusNotifierDescriptor.getCredentialsId();
+            UsernamePasswordCredentials credentials = ArgusNotifier.getCredentialsById(credentialsId);
 
-                OffsetDateTime now = OffsetDateTime.now();
-                long metricTimestamp = now.toEpochSecond();
-                String argusUrl = argusNotifierDescriptor.getArgusUrl();
-                String scope = argusNotifierDescriptor.getScope();
-                String source = argusNotifierDescriptor.getSource();
+            OffsetDateTime now = OffsetDateTime.now();
+            long metricTimestamp = now.toEpochSecond();
+            String argusUrl = argusNotifierDescriptor.getArgusUrl();
+            String scope = argusNotifierDescriptor.getScope();
+            String source = argusNotifierDescriptor.getSource();
 
-                BuildMetricFactory buildMetricFactory = new BuildMetricFactory(instance, run, metricTimestamp, scope);
+            BuildMetricFactory buildMetricFactory = new BuildMetricFactory(instance, run, metricTimestamp, scope);
 
-                List<Metric> metrics =
-                        ImmutableList.<Metric>builder()
-                                .add(buildMetricFactory.getBuildStatusMetric())
-                                .addAll(buildMetricFactory.getBuildTimeMetrics())
-                                .build();
+            List<Metric> metrics =
+                    ImmutableList.<Metric>builder()
+                            .add(buildMetricFactory.getBuildStatusMetric())
+                            .addAll(buildMetricFactory.getBuildTimeMetrics())
+                            .build();
 
-                AnnotationFactory annotationFactory = new AnnotationFactory(instance, run, metricTimestamp, scope, source);
-                List<Annotation> annotations = annotationFactory.getAnnotationsFor(metrics);
+            AnnotationFactory annotationFactory = new AnnotationFactory(instance, run, metricTimestamp, scope, source);
+            List<Annotation> annotations = annotationFactory.getAnnotationsFor(metrics);
 
-                if (logger.isLoggable(Level.INFO)) {
-                    logger.info(MessageFormat.format("Sending metrics to: {0} with username: {1}",
-                            argusUrl,
-                            credentials.getUsername()));
-                }
-                ArgusDataSender.sendArgusData(argusUrl, credentials, metrics, annotations);
+            if (logger.isLoggable(Level.INFO)) {
+                logger.info(MessageFormat.format("Sending metrics to: {0} with username: {1}",
+                        argusUrl,
+                        credentials.getUsername()));
             }
+            ArgusDataSender.sendArgusData(argusUrl, credentials, metrics, annotations);
         }
     }
 }
