@@ -3,12 +3,15 @@
 [![wiki](https://img.shields.io/badge/Argus%20Notifier%20Plugin-WIKI-blue.svg?style=flat)](http://wiki.jenkins-ci.org/display/JENKINS/Argus+Notifier+Plugin)
 
 This Jenkins plugin sends build status and build time (including queue time, build time, and total time) to 
-an [Argus](https://github.com/salesforce/Argus) endpoint.
+an [Argus](https://github.com/salesforce/Argus) endpoint. It also sends system metrics from the 
+[Metrics](https://plugins.jenkins.io/metrics) plugin. Administrators can configure whether system and build metrics
+are automatically sent or not.
 
 ## Metric implementation details 
 * Timings are currently sent in units of seconds for consistency
 * `Result` statuses are mapped to numbers in 
 [BuildResultsResolver](https://github.com/justinharringa/argus-notifier/blob/master/src/main/java/org/jenkinsci/plugins/argusnotifier/BuildResultsResolver.java#L22)
+* Numeric gauge metrics from the [Metrics](https://plugins.jenkins.io/metrics) plugin are sent if configured.
  
 
 ## Plugin Dependencies
