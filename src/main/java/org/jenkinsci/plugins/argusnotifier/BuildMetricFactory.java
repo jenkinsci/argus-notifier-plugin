@@ -43,7 +43,7 @@ class BuildMetricFactory {
         metric.setMetric(BUILD_STATUS);
         // TODO: metric.setNamespace(projectName);
 
-        metric.setTags(TagFactory.buildStatusTags(JenkinsFormatter.getHostName(jenkins),
+        metric.setTags(TagFactory.buildStatusTags(jenkins,
                 jenkinsRunFormatter.getProjectName()));
         Map<Long, Double> datapoints =
                 ImmutableMap.<Long, Double>builder()
@@ -84,7 +84,7 @@ class BuildMetricFactory {
         // TODO: metric.setNamespace(projectName);
         double timeInSeconds = (double) timeInMillis / 1000.0;
 
-        metric.setTags(TagFactory.buildStatusTags(JenkinsFormatter.getHostName(jenkins),
+        metric.setTags(TagFactory.buildStatusTags(jenkins,
                 jenkinsRunFormatter.getProjectName()));
         Map<Long, Double> datapoints =
                 ImmutableMap.<Long, Double>builder()

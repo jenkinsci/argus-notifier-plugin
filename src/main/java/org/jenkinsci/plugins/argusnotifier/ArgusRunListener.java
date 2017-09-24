@@ -42,12 +42,10 @@ public class ArgusRunListener extends RunListener<Run> {
                 (ArgusNotifier.DescriptorImpl) instance.getDescriptor(ArgusNotifier.class);
         if (argusNotifierDescriptor != null &&
                 argusNotifierDescriptor.isNotifierConfigured() && argusNotifierDescriptor.isSendForAllBuilds()) {
-            String credentialsId = argusNotifierDescriptor.getCredentialsId();
-            UsernamePasswordCredentials credentials = ArgusNotifier.getCredentialsById(credentialsId);
+            ArgusConnectionInfo argusConnectionInfo = argusNotifierDescriptor.getArgusConnectionInfo();
 
             OffsetDateTime now = OffsetDateTime.now();
             long metricTimestamp = now.toEpochSecond();
-            String argusUrl = argusNotifierDescriptor.getArgusUrl();
             String scope = argusNotifierDescriptor.getScope();
             String source = argusNotifierDescriptor.getSource();
 
@@ -63,11 +61,12 @@ public class ArgusRunListener extends RunListener<Run> {
             List<Annotation> annotations = annotationFactory.getAnnotationsFor(metrics);
 
             if (logger.isLoggable(Level.INFO)) {
-                logger.info(MessageFormat.format("Sending metrics to: {0} with username: {1}",
-                        argusUrl,
-                        credentials.getUsername()));
+                logger.info(MessageFormat.format("Sending metrics for {0} to: {1} with username: {2}",
+                        run.getFullDisplayName(),
+                        argusConnectionInfo.argusUrl,
+                        argusConnectionInfo.credentials.getUsername()));
             }
-            ArgusDataSender.sendArgusData(argusUrl, credentials, metrics, annotations);
+            ArgusDataSender.sendArgusData(argusConnectionInfo, metrics, annotations);
         }
     }
 }

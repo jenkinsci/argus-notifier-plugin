@@ -7,6 +7,7 @@ import com.salesforce.dva.argus.sdk.entity.Metric;
 import com.salesforce.dva.argus.sdk.excpetions.TokenExpiredException;
 import hudson.util.Secret;
 
+import java.net.UnknownHostException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -27,23 +28,25 @@ class ArgusDataSender {
     /**
      * Send metrics and annotations to Argus via the provided argusUrl and credentials.
      *
-     * @param argusUrl URL to use to connect to the Argus Web Service
-     * @param credentials UsernamePasswordCredentials to use to authenticate with the Argus web service
+     * @param argusConnectionInfo ArgusConnectionInfo to use to authenticate with the Argus web service
      * @param metrics Metrics to publish to Argus
      * @param annotations Annotations to publish to Argus (associated with the metrics)
      */
-    static void sendArgusData(String argusUrl,
-                              UsernamePasswordCredentials credentials,
+    static void sendArgusData(ArgusConnectionInfo argusConnectionInfo,
                               List<Metric> metrics,
                               List<Annotation> annotations) {
         try (
-                ArgusService service = ArgusService.getInstance(argusUrl, 1)
+                ArgusService service = ArgusService.getInstance(argusConnectionInfo.argusUrl, 1)
         ) {
-            service.getAuthService().login(credentials.getUsername(), Secret.toString(credentials.getPassword()));
+            UsernamePasswordCredentials credentials = argusConnectionInfo.credentials;
+            service.getAuthService().login(credentials.getUsername(),
+                    Secret.toString(credentials.getPassword()));
 
             service.getMetricService().putMetrics(metrics);
 
-            service.getAnnotationService().putAnnotations(annotations);
+            if (annotations != null && !annotations.isEmpty()) {
+                service.getAnnotationService().putAnnotations(annotations);
+            }
 
             if (logger.isLoggable(Level.INFO)) {
                 logger.info("Argus Notifier: Sent message to Argus successfully!");
@@ -53,6 +56,13 @@ class ArgusDataSender {
             //TODO: do something?
             if (logger.isLoggable(Level.WARNING)) {
                 logger.warning("Token expired.");
+            }
+        } catch (UnknownHostException unknownHostException) {
+            if (logger.isLoggable(Level.SEVERE)) {
+                logger.log(Level.SEVERE,
+                        "Host not found! Check your Argus server configuration in Manage Jenkins -> Configure " +
+                                "System or your network configuration",
+                        unknownHostException);
             }
         } catch (Exception e) {
             if (logger.isLoggable(Level.SEVERE)) {

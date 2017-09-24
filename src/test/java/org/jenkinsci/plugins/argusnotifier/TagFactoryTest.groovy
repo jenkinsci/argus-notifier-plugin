@@ -1,5 +1,6 @@
 package org.jenkinsci.plugins.argusnotifier
 
+import jenkins.model.Jenkins
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -8,6 +9,13 @@ import static org.jenkinsci.plugins.argusnotifier.TagFactory.Tag.PROJECT
 
 @Unroll
 class TagFactoryTest extends Specification {
+
+    public static final String ROOT_URL = "root"
+    private Jenkins jenkins = Mock(Jenkins)
+
+    def setup() {
+        jenkins.getRootUrl() >> ROOT_URL
+    }
 
     def '#tag is lowercased with lower()'() {
         when:
@@ -23,14 +31,11 @@ class TagFactoryTest extends Specification {
     }
 
     def 'rootUrl makes it in as host tag'() {
-        given:
-        String rootUrl = "root"
-
         when:
-        def tags = TagFactory.buildStatusTags(rootUrl, "")
+        def tags = TagFactory.buildStatusTags(jenkins, "")
 
         then:
-        tags[HOST.lower()] == rootUrl
+        tags[HOST.lower()] == ROOT_URL
     }
 
     def 'project makes it in as project tag'() {
@@ -38,7 +43,7 @@ class TagFactoryTest extends Specification {
         String project = "myProject"
 
         when:
-        def tags = TagFactory.buildStatusTags("", project)
+        def tags = TagFactory.buildStatusTags(jenkins, project)
 
         then:
         tags[PROJECT.lower()] == project
