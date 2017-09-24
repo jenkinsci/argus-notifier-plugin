@@ -1,4 +1,4 @@
 <?jelly escape-by-default='true'?>
 <div>
-  Send build and system metrics to an Argus server.
+  Send build and system metrics to an <a href="https://github.com/salesforce/Argus">Argus</a> server.
 </div>
