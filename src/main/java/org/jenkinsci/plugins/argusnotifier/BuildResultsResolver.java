@@ -9,6 +9,9 @@ import javax.annotation.Nonnull;
 import java.util.Map;
 
 /**
+ * This class resolves build results into different forms (e.g. contextual status like
+ * "STILL FAILING" or "FIXED", numeric status for metric datapoints).
+ *
  * @author Justin Harringa
  */
 public class BuildResultsResolver {
