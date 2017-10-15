@@ -48,4 +48,15 @@ class TagFactoryTest extends Specification {
         then:
         tags[PROJECT.lower()] == project
     }
+
+    def 'Tag.values() contains #tag'() {
+        when:
+        def values = TagFactory.Tag.values()
+
+        then:
+        values.contains(tag)
+
+        where:
+        tag << [HOST, PROJECT]
+    }
 }

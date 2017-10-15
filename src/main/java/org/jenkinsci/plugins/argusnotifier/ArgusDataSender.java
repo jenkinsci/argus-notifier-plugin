@@ -71,6 +71,13 @@ class ArgusDataSender {
         }
     }
 
+    /**
+     * Used to test the connection to the Argus server in the Jenkins config screen to validate configuration
+     *
+     * @param argusUrl - URL of the Argus web service
+     * @param credentials - credentials to access the web service
+     * @return successfully logged into Argus web service
+     */
     static boolean testConnection(String argusUrl, UsernamePasswordCredentials credentials) {
         try (ArgusService service = ArgusService.getInstance(argusUrl, 1)) {
             service.getAuthService().login(credentials.getUsername(), credentials.getPassword().getPlainText());
