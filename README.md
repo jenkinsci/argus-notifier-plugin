@@ -7,6 +7,15 @@ an [Argus](https://github.com/salesforce/Argus) endpoint. It also sends system m
 [Metrics](https://plugins.jenkins.io/metrics) plugin. Administrators can configure whether system and build metrics
 are automatically sent or not.
 
+### Table of Contents
+* [Metric implementation details](#metric-implementation-details)
+* [Plugin Dependencies](#plugin-dependencies)
+* [Developer Stuff](#developer-stuff)
+  * [Build](#build)
+  * [Test](#test)
+  * [Releasing](#releasing)
+    
+
 ## Metric implementation details 
 * Timings are currently sent in units of seconds for consistency
 * `Result` statuses are mapped to numbers in 
@@ -19,12 +28,14 @@ are automatically sent or not.
 * [Credentials](https://plugins.jenkins.io/credentials) - securely store your [Argus](https://github.com/salesforce/Argus)
 credentials 
 
-## Build
+## Developer Stuff
+
+### Build
 To build the project with [Maven](https://maven.apache.org/), simply run `mvn clean package`
 
-## Test
+### Test
 Run `mvn clean hpi:run` to start up a test version of Jenkins with the requisite plugins installed.
 
-## Releasing
+### Releasing
 Run `mvn release:prepare release:perform` but ensure that your Maven `settings.xml` has been 
 [set up with your Artifactory password](https://wiki.jenkins.io/display/JENKINS/Hosting+Plugins#HostingPlugins-Releasingtojenkins-ci.org)
