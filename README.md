@@ -11,6 +11,8 @@ are automatically sent or not.
 * [Demo](#demo)
   * [Configuration](#configuration)
   * [Show me the money!](#show-me-the-money)
+    * [Queue Visualization (w/ legend)](#queue-visualization-w-legend)
+    * [Queue Visualization (you can hover to see labels)](#queue-visualization-you-can-hover-over-the-graph-to-see-labels)
 * [Metric implementation details](#metric-implementation-details)
 * [Plugin Dependencies](#plugin-dependencies)
 * [Developer Stuff](#developer-stuff)
@@ -60,7 +62,6 @@ Clearly we're going to have jobs queue up. So, let's check out our queue metrics
 
 #### Queue Visualization (you can hover over the graph to see labels)
 ![Queue visualization with hover](https://s3-us-west-1.amazonaws.com/argus-notifier-plugin/jenkins-queue-visualiation-hover.gif) 
-
 
 ## Metric implementation details 
 * Timings are currently sent in units of seconds for consistency
