@@ -58,10 +58,10 @@ Behold, the Jenkins jobs:
 
 Clearly we're going to have jobs queue up. So, let's check out our queue metrics in Argus:
 #### Queue Visualization (w/ legend)
-![Queue visualization with legend](https://s3-us-west-1.amazonaws.com/argus-notifier-plugin/jenkins-queue-visualiation-legend.gif) 
+![Queue visualization with legend](https://s3-us-west-1.amazonaws.com/argus-notifier-plugin/jenkins-queue-visualization-legend.gif) 
 
 #### Queue Visualization (you can hover over the graph to see labels)
-![Queue visualization with hover](https://s3-us-west-1.amazonaws.com/argus-notifier-plugin/jenkins-queue-visualiation-hover.gif) 
+![Queue visualization with hover](https://s3-us-west-1.amazonaws.com/argus-notifier-plugin/jenkins-queue-visualization-hover.gif) 
 
 ## Metric implementation details 
 * Timings are currently sent in units of seconds for consistency
