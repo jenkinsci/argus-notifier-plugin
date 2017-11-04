@@ -13,6 +13,8 @@ are automatically sent or not.
   * [Show me the money!](#show-me-the-money)
     * [Queue Information](#queue-information)
     * [Executor Information](#executor-information)
+    * [Build Times and Statuses](#build-times-and-statuses)
+    * [System Information](#system-information)
 * [Metric implementation details](#metric-implementation-details)
 * [Plugin Dependencies](#plugin-dependencies)
 * [Developer Stuff](#developer-stuff)
@@ -69,6 +71,18 @@ Let's see how those executors are doing...
 
 ![Executor visualization with legend](https://s3-us-west-1.amazonaws.com/argus-notifier-plugin/jenkins-executor-visualization-legend.gif) 
 ![Executor visualization with hover](https://s3-us-west-1.amazonaws.com/argus-notifier-plugin/jenkins-executor-visualization-hover.gif) 
+
+#### Build Times and Statuses
+What about those build runs?
+
+![Build visualization with legend](https://s3-us-west-1.amazonaws.com/argus-notifier-plugin/jenkins-build-visualization-legend.gif) 
+![Build visualization with hover](https://s3-us-west-1.amazonaws.com/argus-notifier-plugin/jenkins-build-visualization-hover.gif) 
+
+#### System Information
+![System visualization with legend](https://s3-us-west-1.amazonaws.com/argus-notifier-plugin/jenkins-system-visualization-legend.gif) 
+![System visualization with hover](https://s3-us-west-1.amazonaws.com/argus-notifier-plugin/jenkins-system-visualization-hover.gif) 
+![System animation](https://s3-us-west-1.amazonaws.com/argus-notifier-plugin/jenkins-system-visualization.gif) 
+
 
 ## Metric implementation details 
 * Timings are currently sent in units of seconds for consistency
