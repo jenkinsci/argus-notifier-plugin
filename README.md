@@ -11,8 +11,8 @@ are automatically sent or not.
 * [Demo](#demo)
   * [Configuration](#configuration)
   * [Show me the money!](#show-me-the-money)
-    * [Queue Visualization (w/ legend)](#queue-visualization-w-legend)
-    * [Queue Visualization (you can hover to see labels)](#queue-visualization-you-can-hover-over-the-graph-to-see-labels)
+    * [Queue Information](#queue-information)
+    * [Executor Information](#executor-information)
 * [Metric implementation details](#metric-implementation-details)
 * [Plugin Dependencies](#plugin-dependencies)
 * [Developer Stuff](#developer-stuff)
@@ -56,12 +56,19 @@ So, let's say we have a few jobs set up on Jenkins and a couple of them run quit
 Behold, the Jenkins jobs:
 ![Jenkins jobs](https://s3-us-west-1.amazonaws.com/argus-notifier-plugin/jenkins-jobs-in-queue.gif)
 
-Clearly we're going to have jobs queue up. So, let's check out our queue metrics in Argus:
+#### Queue Information
+Clearly we're going to have jobs queue up since we only have 2 executors (WHAT?! NO AGENTS!!). So, let's check out our queue metrics in Argus:
 #### Queue Visualization (w/ legend)
 ![Queue visualization with legend](https://s3-us-west-1.amazonaws.com/argus-notifier-plugin/jenkins-queue-visualization-legend.gif) 
 
 #### Queue Visualization (you can hover over the graph to see labels)
 ![Queue visualization with hover](https://s3-us-west-1.amazonaws.com/argus-notifier-plugin/jenkins-queue-visualization-hover.gif) 
+
+#### Executor Information
+Let's see how those executors are doing...
+
+![Executor visualization with legend](https://s3-us-west-1.amazonaws.com/argus-notifier-plugin/jenkins-executor-visualization-legend.gif) 
+![Executor visualization with hover](https://s3-us-west-1.amazonaws.com/argus-notifier-plugin/jenkins-executor-visualization-hover.gif) 
 
 ## Metric implementation details 
 * Timings are currently sent in units of seconds for consistency
