@@ -54,7 +54,7 @@ So, let's say we have a few jobs set up on Jenkins and a couple of them run quit
 2. `sir-runs-alot` runs every 3 minutes, says "yep" and then sleeps for 70 seconds
 
 Behold, the Jenkins jobs:
-![Jenkins jobs](https://s3-us-west-1.amazonaws.com/argus-notifier-plugin/jenkins-jobs.gif)
+![Jenkins jobs](https://s3-us-west-1.amazonaws.com/argus-notifier-plugin/jenkins-jobs-in-queue.gif)
 
 Clearly we're going to have jobs queue up. So, let's check out our queue metrics in Argus:
 #### Queue Visualization (w/ legend)
