@@ -9,7 +9,8 @@ are automatically sent or not.
 
 ### Table of Contents
 * [Demo](#demo)
-  * [How do I get started?](#how-do-i-get-started)
+  * [Configuration](#configuration)
+  * [Show me the money!](#show-me-the-money)
 * [Metric implementation details](#metric-implementation-details)
 * [Plugin Dependencies](#plugin-dependencies)
 * [Developer Stuff](#developer-stuff)
@@ -22,7 +23,7 @@ So, you're using, or considering, the [Argus](https://github.com/salesforce/Argu
 time-series monitoring and alerting platform and you also use Jenkins. Well, hey, 
 you should check this plugin out to easily send Jenkins metrics to [Argus](https://github.com/salesforce/Argus).
 
-### How do I get started?
+### Configuration
 First, you'll need to have a valid `Username with Password` credential set up in your Jenkins 
 credentials. Next, you simply go to `Jenkins -> Manage Jenkins -> Configure System` and find the 
 configuration for `Argus Notifier`. Then you'll configure the following values:
@@ -41,9 +42,25 @@ completion
 You can test that your connection works by hitting the `Test Connection` button as long as
 you've selected a valid `Credentials Id` and filled in your `Argus URL`. See below:
 
-![Argus Notifier configuration - Test Connection animation](https://s3-us-west-1.amazonaws.com/static.harringa.com/argus-notifier-plugin/connection-validation.gif)
+![Argus Notifier configuration - Test Connection animation](https://s3-us-west-1.amazonaws.com/argus-notifier-plugin/connection-validation.gif)
 
 Once you've saved or applied your Jenkins configuration, the plugin will go to work.
+
+### Show me the money!
+So, let's say we have a few jobs set up on Jenkins and a couple of them run quite a bit:
+1. `concurrent-runner` runs every minute and sleeps for 90 seconds
+2. `sir-runs-alot` runs every 3 minutes, says "yep" and then sleeps for 70 seconds
+
+Behold, the Jenkins jobs:
+![Jenkins jobs](https://s3-us-west-1.amazonaws.com/argus-notifier-plugin/jenkins-jobs.gif)
+
+Clearly we're going to have jobs queue up. So, let's check out our queue metrics in Argus:
+#### Queue Visualization (w/ legend)
+![Queue visualization with legend](https://s3-us-west-1.amazonaws.com/argus-notifier-plugin/jenkins-queue-visualiation-legend.gif) 
+
+#### Queue Visualization (you can hover over the graph to see labels)
+![Queue visualization with hover](https://s3-us-west-1.amazonaws.com/argus-notifier-plugin/jenkins-queue-visualiation-hover.gif) 
+
 
 ## Metric implementation details 
 * Timings are currently sent in units of seconds for consistency
