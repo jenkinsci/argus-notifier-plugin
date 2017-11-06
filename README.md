@@ -15,6 +15,7 @@ are automatically sent or not.
     * [Executor Information](#executor-information)
     * [Build Times and Statuses](#build-times-and-statuses)
     * [System Information](#system-information)
+    * [Alerts](#alerts)
 * [Metric implementation details](#metric-implementation-details)
 * [Plugin Dependencies](#plugin-dependencies)
 * [Developer Stuff](#developer-stuff)
@@ -83,6 +84,8 @@ What about those build runs?
 ![System visualization with hover](https://s3-us-west-1.amazonaws.com/argus-notifier-plugin/jenkins-system-visualization-hover.gif) 
 ![System animation](https://s3-us-west-1.amazonaws.com/argus-notifier-plugin/jenkins-system-visualization.gif) 
 
+#### Alerts
+Of course, since [Argus](https://github.com/salesforce/Argus) is also an alerting platform you could set alerts for any of these metrics. :smile:
 
 ## Metric implementation details 
 * Timings are currently sent in units of seconds for consistency
