@@ -14,6 +14,7 @@ import hudson.Launcher;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.BuildListener;
+import hudson.model.User;
 import hudson.security.ACL;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.BuildStepMonitor;
@@ -28,6 +29,7 @@ import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.interceptor.RequirePOST;
 
 import java.io.IOException;
 import java.text.MessageFormat;
@@ -160,16 +162,39 @@ public class ArgusNotifier extends Notifier {
             load();
         }
 
+        /**
+         * Returns whether the current user is logged in and has ADMINISTER permission.
+         * @return
+         */
+        private boolean isUserAdmin() {
+            User currentUser = User.current();
+            return currentUser != null && currentUser.hasPermission(Jenkins.ADMINISTER);
+        }
+
+        /**
+         * Test a connection to the given argusUrl with the given credential
+         * @param argusUrl - Argus web service URL to test the connection against
+         * @param credentialsId - Jenkins credential to use for the test
+         * @return
+         */
+        @RequirePOST
         public FormValidation doTestConnection(@QueryParameter("argusUrl") String argusUrl,
                                                @QueryParameter("credentialsId") String credentialsId) {
-            if (argusUrl == null || argusUrl.trim().isEmpty() || credentialsId == null || credentialsId.trim().isEmpty()) {
-                return FormValidation.error("Please fill in the connection details.");
-            } else if (ArgusDataSender.testConnection(stripTrailingSlash(argusUrl), getCredentialsById(credentialsId))) {
-                return FormValidation.ok("Success!");
+            if (isUserAdmin()) {
+                if (argusUrl == null || argusUrl.trim().isEmpty() || credentialsId == null || credentialsId.trim().isEmpty()) {
+                    return FormValidation.error("Please fill in the connection details.");
+                } else if (ArgusDataSender.testConnection(stripTrailingSlash(argusUrl), getCredentialsById(credentialsId))) {
+                    return FormValidation.ok("Success!");
+                } else {
+                    return FormValidation.error(
+                            MessageFormat.format("Error connecting to {0}. More details can be found in the logs.",
+                                    argusUrl));
+                }
             } else {
-                return FormValidation.error(
-                        MessageFormat.format("Error connecting to {0}. More details can be found in the logs.",
-                                argusUrl));
+                logger.warning(
+                        String.format("%s (unprivileged) tried to test an Argus connection with the following URL: %s",
+                                User.current(), argusUrl));
+                return FormValidation.error("Access denied: You have not logged in or do not have administer permissions");
             }
         }
 
@@ -238,15 +263,22 @@ public class ArgusNotifier extends Notifier {
          * @return A ListBoxModel containing all global credentials
          */
         public ListBoxModel doFillCredentialsIdItems() {
-            return new StandardListBoxModel()
-                    .includeEmptyValue()
-                    .withMatching(
-                            CredentialsMatchers.allOf(CredentialsMatchers.instanceOf(StandardUsernamePasswordCredentials.class)),
-                            CredentialsProvider.lookupCredentials(StandardCredentials.class,
-                                    Jenkins.getInstance(),
-                                    ACL.SYSTEM,
-                                    Collections.emptyList())
-                    );
+            if (isUserAdmin()) {
+                return new StandardListBoxModel()
+                        .includeEmptyValue()
+                        .withMatching(
+                                CredentialsMatchers.allOf(CredentialsMatchers.instanceOf(StandardUsernamePasswordCredentials.class)),
+                                CredentialsProvider.lookupCredentials(StandardCredentials.class,
+                                        Jenkins.getInstance(),
+                                        ACL.SYSTEM,
+                                        Collections.emptyList())
+                        );
+            } else {
+                logger.warning(
+                        String.format("%s (unprivileged) tried to get the list of possible Argus credentials",
+                                User.current()));
+                return new StandardListBoxModel().includeEmptyValue();
+            }
         }
 
     }
