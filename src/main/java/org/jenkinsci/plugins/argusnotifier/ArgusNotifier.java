@@ -277,7 +277,7 @@ public class ArgusNotifier extends Notifier {
                 logger.warning(
                         String.format("%s (unprivileged) tried to get the list of possible Argus credentials",
                                 User.current()));
-                return new StandardListBoxModel().includeEmptyValue();
+                return new ListBoxModel();
             }
         }
 
