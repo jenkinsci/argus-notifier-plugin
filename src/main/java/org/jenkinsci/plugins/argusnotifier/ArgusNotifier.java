@@ -190,9 +190,6 @@ public class ArgusNotifier extends Notifier {
                                     argusUrl));
                 }
             } else {
-                logger.warning(
-                        String.format("%s (unprivileged) tried to test an Argus connection with the following URL: %s",
-                                User.current(), argusUrl));
                 return FormValidation.error("Access denied: You have not logged in or do not have administer permissions");
             }
         }
@@ -273,9 +270,6 @@ public class ArgusNotifier extends Notifier {
                                         Collections.emptyList())
                         );
             } else {
-                logger.warning(
-                        String.format("%s (unprivileged) tried to get the list of possible Argus credentials",
-                                User.current()));
                 return new ListBoxModel();
             }
         }
