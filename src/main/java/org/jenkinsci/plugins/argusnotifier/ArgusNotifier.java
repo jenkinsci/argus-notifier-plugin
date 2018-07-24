@@ -167,8 +167,7 @@ public class ArgusNotifier extends Notifier {
          * @return
          */
         private boolean isUserAdmin() {
-            User currentUser = User.current();
-            return currentUser != null && currentUser.hasPermission(Jenkins.ADMINISTER);
+            return Jenkins.getInstance().hasPermission(Jenkins.ADMINISTER);
         }
 
         /**
