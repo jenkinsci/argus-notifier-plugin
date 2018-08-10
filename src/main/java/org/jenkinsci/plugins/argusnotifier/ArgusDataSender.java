@@ -4,7 +4,7 @@ import com.cloudbees.plugins.credentials.common.UsernamePasswordCredentials;
 import com.salesforce.dva.argus.sdk.ArgusService;
 import com.salesforce.dva.argus.sdk.entity.Annotation;
 import com.salesforce.dva.argus.sdk.entity.Metric;
-import com.salesforce.dva.argus.sdk.excpetions.TokenExpiredException;
+import com.salesforce.dva.argus.sdk.exceptions.TokenExpiredException;
 import hudson.util.Secret;
 
 import java.net.UnknownHostException;
@@ -82,10 +82,6 @@ class ArgusDataSender {
         try (ArgusService service = ArgusService.getInstance(argusUrl, 1)) {
             service.getAuthService().login(credentials.getUsername(), credentials.getPassword().getPlainText());
             return true;
-        } catch (TokenExpiredException e) {
-            if (logger.isLoggable(Level.WARNING)) {
-                logger.warning("Token expired when testing connection.");
-            }
         } catch (UnknownHostException unknownHostException) {
             if (logger.isLoggable(Level.SEVERE)) {
                 logger.log(Level.SEVERE, UNKNOWN_HOST_MESSAGE, unknownHostException);
