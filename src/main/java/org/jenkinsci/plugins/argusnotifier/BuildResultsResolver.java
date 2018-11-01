@@ -60,6 +60,10 @@ public class BuildResultsResolver {
         }
     }
 
+    public static String getMetricName(Result buildResult) {
+        return "build." + BuildResultsResolver.getResultString(buildResult).toLowerCase();
+    }
+
     public static Double translateResultToNumber(Result result) {
         return BUILD_STATUS_MAPPING.get(getResultString(result));
     }

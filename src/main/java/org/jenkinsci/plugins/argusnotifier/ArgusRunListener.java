@@ -1,6 +1,5 @@
 package org.jenkinsci.plugins.argusnotifier;
 
-import com.cloudbees.plugins.credentials.common.UsernamePasswordCredentials;
 import com.google.common.collect.ImmutableList;
 import com.salesforce.dva.argus.sdk.entity.Annotation;
 import com.salesforce.dva.argus.sdk.entity.Metric;
@@ -14,7 +13,6 @@ import javax.annotation.Nonnull;
 import java.text.MessageFormat;
 import java.time.OffsetDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -53,7 +51,7 @@ public class ArgusRunListener extends RunListener<Run> {
 
             List<Metric> metrics =
                     ImmutableList.<Metric>builder()
-                            .add(buildMetricFactory.getBuildStatusMetric())
+                            .addAll(buildMetricFactory.getBuildStatusMetrics())
                             .addAll(buildMetricFactory.getBuildTimeMetrics())
                             .build();
 

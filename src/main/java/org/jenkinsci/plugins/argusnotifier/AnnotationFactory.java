@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static org.jenkinsci.plugins.argusnotifier.BuildMetricFactory.BUILD_STATUS_LABEL;
+import static org.jenkinsci.plugins.argusnotifier.BuildMetricFactory.NUMERIC_BUILD_STATUS_LABEL;
 
 class AnnotationFactory {
     static final String BUILD_ANNOTATION_TYPE = "BUILD";
@@ -45,7 +45,7 @@ class AnnotationFactory {
         annotation.setTags(metric.getTags());
         Map<String, String> fields =
                 ImmutableMap.<String, String>builder()
-                        .put(BUILD_STATUS_LABEL, jenkinsRunFormatter.getContextualResult())
+                        .put(NUMERIC_BUILD_STATUS_LABEL, jenkinsRunFormatter.getContextualResult())
                         .put(BUILD_NUMBER_LABEL, jenkinsRunFormatter.getBuildNumberString())
                         .put(URL_LABEL, jenkinsRunFormatter.getRunUrl())
                         .build();

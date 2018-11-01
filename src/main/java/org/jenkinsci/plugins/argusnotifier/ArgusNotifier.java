@@ -14,7 +14,6 @@ import hudson.Launcher;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.BuildListener;
-import hudson.model.User;
 import hudson.security.ACL;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.BuildStepMonitor;
@@ -85,7 +84,7 @@ public class ArgusNotifier extends Notifier {
 
         List<Metric> metrics =
                 ImmutableList.<Metric>builder()
-                        .add(buildMetricFactory.getBuildStatusMetric())
+                        .addAll(buildMetricFactory.getBuildStatusMetrics())
                         .addAll(buildMetricFactory.getBuildTimeMetrics())
                         .build();
 
