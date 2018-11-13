@@ -32,14 +32,15 @@ class BuildMetricFactoryTest extends Specification {
         BuildMetricFactory metricFactory = new BuildMetricFactory(jenkins, run, metricTimestamp, scope)
 
         when:
-        Metric metric = metricFactory.buildStatusMetric
+        List<Metric> metrics = metricFactory.buildStatusMetrics
+        Metric mainMetric = metrics.get(0)
 
         then:
-        metric.displayName == expectedDisplayName
+        mainMetric.displayName == expectedDisplayName
 
         where:
         jobFolderName | expectedDisplayName
-        "myfolder"    | "myfolder." + FULL_JOB_NAME + ": " + BuildMetricFactory.BUILD_STATUS_LABEL
-        ""            | FULL_JOB_NAME + ": " + BuildMetricFactory.BUILD_STATUS_LABEL
+        "myfolder"    | "myfolder." + FULL_JOB_NAME + ": " + BuildMetricFactory.NUMERIC_BUILD_STATUS_LABEL
+        ""            | FULL_JOB_NAME + ": " + BuildMetricFactory.NUMERIC_BUILD_STATUS_LABEL
     }
 }
