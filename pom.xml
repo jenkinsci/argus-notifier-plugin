@@ -6,7 +6,7 @@
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>plugin</artifactId>
         <version>2.11</version>
-        <relativePath />
+        <relativePath/>
     </parent>
 
     <artifactId>argus-notifier</artifactId>
@@ -26,7 +26,7 @@
              ~ hpi-plugin.version: The HPI Maven Plugin version used by the plugin..
              ~ stapler-plugin.version: The Stapler Maven plugin version required by the plugin.
         -->
-        <argus-sdk.version>2.17.1</argus-sdk.version>
+        <argus-sdk.version>2.22.0</argus-sdk.version>
         <groovy.eclipse.batch.version>2.4.3-01</groovy.eclipse.batch.version>
         <groovy.eclipse.compiler.version>2.9.2-01</groovy.eclipse.compiler.version>
         <groovy.version>2.4.12</groovy.version>
