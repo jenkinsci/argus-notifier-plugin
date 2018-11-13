@@ -36,7 +36,7 @@ class TagFactory {
     static Map<String, String> buildStatusTags(Jenkins jenkins, String projectName) {
         return ImmutableMap.<String, String>builder()
                 .putAll(hostTag(jenkins))
-                .put(PROJECT.lower(), projectName)
+                .put(PROJECT.lower(), InvalidCharSwap.swapWithDash(projectName))
                 .build();
     }
 

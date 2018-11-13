@@ -2,7 +2,6 @@ package org.jenkinsci.plugins.argusnotifier
 
 import com.salesforce.dva.argus.sdk.entity.Annotation
 import com.salesforce.dva.argus.sdk.entity.Metric
-import hudson.model.AbstractBuild
 import hudson.model.Job
 import hudson.model.Result
 import hudson.model.Run
@@ -56,9 +55,9 @@ class AnnotationFactoryTest extends Specification {
         buildStatusAnnotation.fields[field] == jenkinsBuildFormatter[formatterMethod]
 
         where:
-        field                                 | formatterMethod
-        BuildMetricFactory.BUILD_STATUS_LABEL | "contextualResult"
-        AnnotationFactory.BUILD_NUMBER_LABEL  | "buildNumberString"
-        AnnotationFactory.URL_LABEL           | "runUrl"
+        field                                         | formatterMethod
+        BuildMetricFactory.NUMERIC_BUILD_STATUS_LABEL | "contextualResult"
+        AnnotationFactory.BUILD_NUMBER_LABEL          | "buildNumberString"
+        AnnotationFactory.URL_LABEL                   | "runUrl"
     }
 }

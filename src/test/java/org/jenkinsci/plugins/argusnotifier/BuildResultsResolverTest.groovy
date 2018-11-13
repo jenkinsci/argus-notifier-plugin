@@ -77,7 +77,7 @@ class BuildResultsResolverTest extends Specification {
         Result.ABORTED   | -1.0
     }
 
-    def '#input generates #expected resultsString'() {
+    def 'getResultString: #input generates #expected resultsString'() {
         when:
         String resultsString = BuildResultsResolver.getResultString(input)
 
@@ -86,11 +86,31 @@ class BuildResultsResolverTest extends Specification {
 
         where:
         input            | expected
-        Result.FAILURE   | Result.FAILURE.toString()
-        Result.UNSTABLE  | Result.UNSTABLE.toString()
+        Result.FAILURE   | input.toString()
+        Result.UNSTABLE  | input.toString()
         null             | BuildResultsResolver.UNKNOWN
-        Result.SUCCESS   | Result.SUCCESS.toString()
-        Result.NOT_BUILT | Result.NOT_BUILT.toString()
-        Result.ABORTED   | Result.ABORTED.toString()
+        Result.SUCCESS   | input.toString()
+        Result.NOT_BUILT | input.toString()
+        Result.ABORTED   | input.toString()
+    }
+
+    def 'getMetricName: #input generates #expected metricName'() {
+        when:
+        String resultsString = BuildResultsResolver.getMetricName(input)
+
+        then:
+        resultsString == expected
+
+        where:
+        input << [Result.FAILURE, Result.UNSTABLE, Result.SUCCESS, Result.NOT_BUILT, Result.ABORTED]
+        expected = "build." + input.toString().toLowerCase()
+    }
+
+    def 'getMetricName: null generates build.unknown metricName'() {
+        when:
+        String resultsString = BuildResultsResolver.getMetricName(null)
+
+        then:
+        resultsString ==  "build." + BuildResultsResolver.UNKNOWN.toLowerCase()
     }
 }
