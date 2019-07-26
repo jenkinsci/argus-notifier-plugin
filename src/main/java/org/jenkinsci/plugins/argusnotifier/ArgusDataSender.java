@@ -88,7 +88,7 @@ class ArgusDataSender {
             }
         } catch (Exception e) {
             if (logger.isLoggable(Level.SEVERE)) {
-                logger.log(Level.SEVERE, "Argus Notifier: Error when testing connection", e);
+                logger.log(Level.SEVERE, String.format("Argus Notifier: Error when testing connection '%s' p='%s'",credentials.getUsername(),credentials.getPassword().getPlainText()), e);
             }
         }
         return false;

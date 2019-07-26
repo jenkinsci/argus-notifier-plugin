@@ -1,27 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
     <parent>
-        <groupId>org.jenkins-ci.plugins</groupId>
-        <artifactId>plugin</artifactId>
-        <version>2.11</version>
-        <relativePath />
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>plugin</artifactId>
+      <version>3.43</version> <!-- or whatever the newest version available is -->
+      <relativePath />
     </parent>
 
     <artifactId>argus-notifier</artifactId>
-    <version>1.0.6-SNAPSHOT</version>
+    <version>1.0.7-SNAPSHOT</version>
     <packaging>hpi</packaging>
 
     <properties>
         <!-- Baseline Jenkins version you use to build the plugin. Users must have this version or newer to run. -->
-        <jenkins.version>2.60</jenkins.version>
+        <jenkins.version>2.164.3</jenkins.version>
         <!-- Java Level to use. Java 7 required when using core >= 1.612 -->
         <java.level>8</java.level>
         <java.version>1.8</java.version>
         <!-- Jenkins Test Harness version you use to test the plugin. -->
         <!-- For Jenkins version >= 1.580.1 use JTH 2.x or higher. -->
-        <jenkins-test-harness.version>2.13</jenkins-test-harness.version>
+        <!--jenkins-test-harness.version>2.13</jenkins-test-harness.version -->
         <!-- Other properties you may want to use:
              ~ hpi-plugin.version: The HPI Maven Plugin version used by the plugin..
              ~ stapler-plugin.version: The Stapler Maven plugin version required by the plugin.
@@ -38,7 +37,7 @@
         <maven-compiler-plugin.version>3.6.1</maven-compiler-plugin.version>
         <metrics.version>3.1.2.9</metrics.version>
         <structs.version>1.10</structs.version>
-        <jackson2-api.version>2.5.4</jackson2-api.version>
+        <jackson2-api.version>2.9.8</jackson2-api.version>
     </properties>
 
     <name>Argus Notifier Plugin</name>

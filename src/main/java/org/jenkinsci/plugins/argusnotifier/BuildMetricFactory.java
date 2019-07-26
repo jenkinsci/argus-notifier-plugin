@@ -95,8 +95,14 @@ class BuildMetricFactory {
         // TODO: metric.setNamespace(projectName);
         double timeInSeconds = (double) timeInMillis / 1000.0;
 
-        metric.setTags(TagFactory.buildStatusTags(jenkins,
+        if (labelForDisplayName == TOTAL_BUILD_TIME_LABEL) {
+        	metric.setTags(TagFactory.buildExtendedStatusTags(jenkins,
+                    jenkinsRunFormatter.getProjectName(), jenkinsRunFormatter.getBuildNumberString(),jenkinsRunFormatter.getGitCommit()));
+        }
+        else {
+        	metric.setTags(TagFactory.buildStatusTags(jenkins,
                 jenkinsRunFormatter.getProjectName()));
+        }
         Map<Long, Double> datapoints =
                 ImmutableMap.<Long, Double>builder()
                         .put(metricTimestamp, timeInSeconds)

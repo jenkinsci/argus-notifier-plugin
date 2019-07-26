@@ -6,11 +6,13 @@ import jenkins.model.Jenkins;
 
 import javax.annotation.Nonnull;
 
+
 /**
  * Formatter to consistently format Jenkins and Jenkins build info
  */
 class JenkinsRunFormatter {
     
+	public static final String GIT_COMMIT = "BUILD_URL";
     private final String jenkinsUrl;
     private final Run run;
 
@@ -56,6 +58,16 @@ class JenkinsRunFormatter {
         return String.valueOf(run.getNumber());
     }
 
+    public String getGitCommit() {
+    	Object commitId = run.getEnvVars().get(GIT_COMMIT);
+    	if (commitId == null) {
+    		return "";
+    	}
+    	else {
+    		return (String)commitId;
+    	}
+    }
+    
     /**
      * Convenience method to get contextual build result
      *
