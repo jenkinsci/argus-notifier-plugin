@@ -59,6 +59,7 @@ class JenkinsRunFormatter {
     }
 
     public String getGitCommit() {
+    	
     	Object commitId = run.getEnvVars().get(GIT_COMMIT);
     	if (commitId == null) {
     		return "";
