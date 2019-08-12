@@ -95,9 +95,10 @@ class BuildMetricFactory {
         // TODO: metric.setNamespace(projectName);
         double timeInSeconds = (double) timeInMillis / 1000.0;
 
-        if (labelForDisplayName == TOTAL_BUILD_TIME_LABEL) {
+        String gitCommitId = jenkinsRunFormatter.getGitCommit();
+        if (labelForDisplayName == TOTAL_BUILD_TIME_LABEL && !gitCommitId.isEmpty()) {
         	metric.setTags(TagFactory.buildExtendedStatusTags(jenkins,
-                    jenkinsRunFormatter.getProjectName(), jenkinsRunFormatter.getBuildNumberString(),jenkinsRunFormatter.getGitCommit()));
+                    jenkinsRunFormatter.getProjectName(), jenkinsRunFormatter.getBuildNumberString(),gitCommitId));
         }
         else {
         	metric.setTags(TagFactory.buildStatusTags(jenkins,

@@ -12,7 +12,7 @@ import javax.annotation.Nonnull;
  */
 class JenkinsRunFormatter {
     
-	public static final String GIT_COMMIT = "BUILD_URL";
+	public static final String GIT_COMMIT = "GIT_COMMIT";
     private final String jenkinsUrl;
     private final Run run;
 
