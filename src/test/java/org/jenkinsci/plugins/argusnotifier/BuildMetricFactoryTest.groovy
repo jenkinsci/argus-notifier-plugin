@@ -2,6 +2,7 @@ package org.jenkinsci.plugins.argusnotifier
 
 import org.apache.commons.jelly.impl.TagFactory
 
+import com.google.common.collect.ImmutableMap
 import com.salesforce.dva.argus.sdk.entity.Metric
 
 import groovy.json.StringEscapeUtils
@@ -54,9 +55,11 @@ class BuildMetricFactoryTest extends Specification {
         long totalDuration = 5L
         int buildNumber = 349506
         String scope = "testScope"
-        String jobName = "jobFolderName"
-        folder.fullName >> jobName
-        Map<String, String> envVars = new Expando([get: {String  k -> commitId}]) as Map<String, String>
+        String jobFolderName = "a_jobFolderName"
+        folder.fullName >> jobFolderName
+        String commitTag = "GIT_COMMIT"
+        ImmutableMap.Builder<String, String> mapBuilder = ImmutableMap.<String, String>builder().put(commitTag,commitId);
+        Map<String, String> envVars = mapBuilder.build();
         run.getEnvVars() >> envVars
         run.getNumber() >> buildNumber
 
@@ -66,16 +69,11 @@ class BuildMetricFactoryTest extends Specification {
         Metric metricTotalTime = metricFactory.getBuildTimeMetric(BuildMetricFactory.TOTAL_BUILD_TIME_LABEL,BuildMetricFactory.TOTAL_BUILD_TIME_METRIC,totalDuration)
 
         then:
-        if (commitId.isEmpty()) {
-            metricTotalTime.tags['git_commit'] == expectedCommit
-            metricTotalTime.tags['build_number'] == String.valueOf(buildNumber)
-            metricTotalTime.tags['project'] == jobName
-        }
-        else {
-            metricTotalTime.tags['git_commit'] == null
-            metricTotalTime.tags['build_number'] == null
-            metricTotalTime.tags['project'] == jobName
-        }
+
+        metricTotalTime.tags[commitTag.toLowerCase()] == expectedCommit
+        metricTotalTime.tags['build_number'] == commitId.isEmpty() ? null : String.valueOf(buildNumber)
+        metricTotalTime.tags['project'].startsWith(jobFolderName)
+
 
         where:
         commitId                  | expectedCommit
