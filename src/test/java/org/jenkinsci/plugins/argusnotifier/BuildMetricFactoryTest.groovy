@@ -1,6 +1,10 @@
 package org.jenkinsci.plugins.argusnotifier
 
+import org.apache.commons.jelly.impl.TagFactory
+
 import com.salesforce.dva.argus.sdk.entity.Metric
+
+import groovy.json.StringEscapeUtils
 import hudson.model.ItemGroup
 import hudson.model.Job
 import hudson.model.Run
@@ -42,5 +46,40 @@ class BuildMetricFactoryTest extends Specification {
         jobFolderName | expectedDisplayName
         "myfolder"    | "myfolder." + FULL_JOB_NAME + ": " + BuildMetricFactory.NUMERIC_BUILD_STATUS_LABEL
         ""            | FULL_JOB_NAME + ": " + BuildMetricFactory.NUMERIC_BUILD_STATUS_LABEL
+    }
+
+    def 'Total build time metric has git commit tag'() {
+        given:
+        long metricTimestamp = 42L
+        long totalDuration = 5L
+        int buildNumber = 349506
+        String scope = "testScope"
+        String jobName = "jobFolderName"
+        folder.fullName >> jobName
+        Map<String, String> envVars = new Expando([get: {String  k -> commitId}]) as Map<String, String>
+        run.getEnvVars() >> envVars
+        run.getNumber() >> buildNumber
+
+        BuildMetricFactory metricFactory = new BuildMetricFactory(jenkins, run, metricTimestamp, scope)
+
+        when:
+        Metric metricTotalTime = metricFactory.getBuildTimeMetric(BuildMetricFactory.TOTAL_BUILD_TIME_LABEL,BuildMetricFactory.TOTAL_BUILD_TIME_METRIC,totalDuration)
+
+        then:
+        if (commitId.isEmpty()) {
+            metricTotalTime.tags['git_commit'] == expectedCommit
+            metricTotalTime.tags['build_number'] == String.valueOf(buildNumber)
+            metricTotalTime.tags['project'] == jobName
+        }
+        else {
+            metricTotalTime.tags['git_commit'] == null
+            metricTotalTime.tags['build_number'] == null
+            metricTotalTime.tags['project'] == jobName
+        }
+
+        where:
+        commitId                  | expectedCommit
+        "32ds34frg4534ff34fdcdds" | "32ds34frg4534ff34fdcdds"
+        ""                        | null
     }
 }

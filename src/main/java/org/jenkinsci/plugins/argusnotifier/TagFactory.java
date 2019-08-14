@@ -13,10 +13,7 @@ import static org.jenkinsci.plugins.argusnotifier.TagFactory.Tag.*;
  */
 class TagFactory {
     enum Tag {
-        HOST,
-        BUILD_NUMBER,
-        GIT_COMMIT,
-        PROJECT;
+        HOST, BUILD_NUMBER, GIT_COMMIT, PROJECT;
 
         public String lower() {
             return name().toLowerCase();
@@ -35,29 +32,21 @@ class TagFactory {
      * @return
      */
     static Map<String, String> buildStatusTags(Jenkins jenkins, String projectName) {
-        return ImmutableMap.<String, String>builder()
-                .putAll(hostTag(jenkins))
-                .put(PROJECT.lower(), InvalidCharSwap.swapWithDash(projectName))
-                .build();
+        return ImmutableMap.<String, String>builder().putAll(hostTag(jenkins))
+                .put(PROJECT.lower(), InvalidCharSwap.swapWithDash(projectName)).build();
     }
-    
-    static Map<String, String> buildExtendedStatusTags(Jenkins jenkins, String projectName, String buildNumber,String commitId) {
-    	
-    	ImmutableMap.Builder<String,String> mapBuilder = ImmutableMap.<String, String>builder()
-                .putAll(hostTag(jenkins))
-                .put(PROJECT.lower(), InvalidCharSwap.swapWithDash(projectName));
-                
-        if (!commitId.isEmpty()) {
-        	mapBuilder.put(BUILD_NUMBER.lower(),buildNumber)
-                .put(GIT_COMMIT.lower(),commitId);
-        }
+
+    static Map<String, String> buildExtendedStatusTags(Jenkins jenkins, String projectName, String buildNumber,
+            String commitId) {
+
+        ImmutableMap.Builder<String, String> mapBuilder = ImmutableMap.<String, String>builder()
+                .putAll(hostTag(jenkins)).put(PROJECT.lower(), InvalidCharSwap.swapWithDash(projectName));
+        mapBuilder.put(BUILD_NUMBER.lower(), buildNumber).put(GIT_COMMIT.lower(), commitId);
         return mapBuilder.build();
 
     }
 
     static Map<String, String> hostTag(Jenkins jenkins) {
-        return ImmutableMap.<String, String>builder()
-                .put(HOST.lower(), JenkinsFormatter.getHostName(jenkins))
-                .build();
+        return ImmutableMap.<String, String>builder().put(HOST.lower(), JenkinsFormatter.getHostName(jenkins)).build();
     }
 }

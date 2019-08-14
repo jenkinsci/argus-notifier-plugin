@@ -6,13 +6,12 @@ import jenkins.model.Jenkins;
 
 import javax.annotation.Nonnull;
 
-
 /**
  * Formatter to consistently format Jenkins and Jenkins build info
  */
 class JenkinsRunFormatter {
-    
-	public static final String GIT_COMMIT = "GIT_COMMIT";
+
+    public static final String GIT_COMMIT = "GIT_COMMIT";
     private final String jenkinsUrl;
     private final Run run;
 
@@ -34,12 +33,12 @@ class JenkinsRunFormatter {
     }
 
     /**
-     * Will return either just the build URL "job/test/42/" if the Jenkins URL is null or
-     * a full build URL.
+     * Will return either just the build URL "job/test/42/" if the Jenkins URL is
+     * null or a full build URL.
      *
      * @return full run URL if possible
      */
-     String getRunUrl() {
+    String getRunUrl() {
         if (jenkinsUrl == null) {
             return run.getUrl();
         }
@@ -59,16 +58,15 @@ class JenkinsRunFormatter {
     }
 
     public String getGitCommit() {
-    	
-    	Object commitId = run.getEnvVars().get(GIT_COMMIT);
-    	if (commitId == null) {
-    		return "";
-    	}
-    	else {
-    		return (String)commitId;
-    	}
+
+        Object commitId = run.getEnvVars().get(GIT_COMMIT);
+        if (commitId == null) {
+            return "";
+        } else {
+            return (String) commitId;
+        }
     }
-    
+
     /**
      * Convenience method to get contextual build result
      *

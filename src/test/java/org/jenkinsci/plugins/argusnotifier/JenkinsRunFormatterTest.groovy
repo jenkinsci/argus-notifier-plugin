@@ -70,44 +70,43 @@ class JenkinsRunFormatterTest extends Specification {
         then:
         actualBuildNumberString == String.valueOf(buildNumber)
     }
-	
-	def "test getGitCommit returns commit sha"() {
-		given:
-		def gitCommit = commitId
-		
-		ImmutableMap.Builder<String,String> mapBuilder = ImmutableMap.<String, String>builder()
-		mapBuilder.put(JenkinsRunFormatter.GIT_COMMIT, gitCommit)
-		build.getEnvVars() >> mapBuilder.build()
-		JenkinsRunFormatter jenkinsBuildFormatter = new JenkinsRunFormatter(jenkins, build)
-		
-		when:
-		String actualGitCommit = jenkinsBuildFormatter.getGitCommit()
-		
-		then:
-		actualGitCommit == expectedGitCommit
-		
-		where:
-		commitId               | expectedGitCommit
-		"sdsfafdfssdf"     	   | "sdsfafdfssdf"
-		"f6fd56be96ccb7f445c6d8058b76b4c2482a50a6" | "f6fd56be96ccb7f445c6d8058b76b4c2482a50a6"
-	}
-	
-	def "test getGitCommit no such env variable"() {
-		given:
-		def gitCommit = "343245dsawer32fd43fd43"
-		
-		ImmutableMap.Builder<String,String> mapBuilder = ImmutableMap.<String, String>builder()
-		mapBuilder.put("ENV_VAR", gitCommit)
-		build.getEnvVars() >> mapBuilder.build()
-		JenkinsRunFormatter jenkinsBuildFormatter = new JenkinsRunFormatter(jenkins, build)
-		
-		when:
-		String actualGitCommit = jenkinsBuildFormatter.getGitCommit()
-		
-		then:
-		actualGitCommit == ""
 
-	}
+    def "test getGitCommit returns commit sha"() {
+        given:
+        def gitCommit = commitId
+
+        ImmutableMap.Builder<String,String> mapBuilder = ImmutableMap.<String, String>builder()
+        mapBuilder.put(JenkinsRunFormatter.GIT_COMMIT, gitCommit)
+        build.getEnvVars() >> mapBuilder.build()
+        JenkinsRunFormatter jenkinsBuildFormatter = new JenkinsRunFormatter(jenkins, build)
+
+        when:
+        String actualGitCommit = jenkinsBuildFormatter.getGitCommit()
+
+        then:
+        actualGitCommit == expectedGitCommit
+
+        where:
+        commitId               | expectedGitCommit
+        "sdsfafdfssdf"         | "sdsfafdfssdf"
+        "f6fd56be96ccb7f445c6d8058b76b4c2482a50a6" | "f6fd56be96ccb7f445c6d8058b76b4c2482a50a6"
+    }
+
+    def "test getGitCommit no such env variable"() {
+        given:
+        def gitCommit = "343245dsawer32fd43fd43"
+
+        ImmutableMap.Builder<String,String> mapBuilder = ImmutableMap.<String, String>builder()
+        mapBuilder.put("ENV_VAR", gitCommit)
+        build.getEnvVars() >> mapBuilder.build()
+        JenkinsRunFormatter jenkinsBuildFormatter = new JenkinsRunFormatter(jenkins, build)
+
+        when:
+        String actualGitCommit = jenkinsBuildFormatter.getGitCommit()
+
+        then:
+        actualGitCommit == ""
+    }
 
     def "test getContextualResult properly returns FIXED"() {
         // No need to test all of the corner cases again
