@@ -87,8 +87,8 @@ class JenkinsRunFormatterTest extends Specification {
         actualGitCommit == expectedGitCommit
 
         where:
-        commitId               | expectedGitCommit
-        "sdsfafdfssdf"         | "sdsfafdfssdf"
+        commitId                                   | expectedGitCommit
+        "0fc255bb26fcc4a0548c3ca14caec6a7d6de7c25" | "0fc255bb26fcc4a0548c3ca14caec6a7d6de7c25"
         "f6fd56be96ccb7f445c6d8058b76b4c2482a50a6" | "f6fd56be96ccb7f445c6d8058b76b4c2482a50a6"
     }
 
