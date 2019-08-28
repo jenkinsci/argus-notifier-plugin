@@ -1,14 +1,11 @@
 package org.jenkinsci.plugins.argusnotifier
 
-import org.apache.commons.jelly.impl.TagFactory
-
-import com.google.common.collect.ImmutableMap
 import com.salesforce.dva.argus.sdk.entity.Metric
-
-import groovy.json.StringEscapeUtils
 import hudson.model.ItemGroup
 import hudson.model.Job
 import hudson.model.Run
+import hudson.model.Result
+import hudson.util.LogTaskListener;
 import jenkins.model.Jenkins
 import spock.lang.Specification
 import spock.lang.Unroll
@@ -20,6 +17,7 @@ class BuildMetricFactoryTest extends Specification {
     private Jenkins jenkins = Mock(Jenkins)
     private Run run = Mock(Run)
     private ItemGroup folder = Mock(ItemGroup)
+    private LogTaskListener listener = Mock(LogTaskListener)
 
     def setup() {
         jenkins.rootUrl >> "jenkinsrooturl"
@@ -49,7 +47,7 @@ class BuildMetricFactoryTest extends Specification {
         ""            | FULL_JOB_NAME + ": " + BuildMetricFactory.NUMERIC_BUILD_STATUS_LABEL
     }
 
-    def 'Total build time metric has git commit tag'() {
+    def 'Total build time metric with #commitId has git commit tag #expectedCommit'() {
         given:
         long metricTimestamp = 42L
         long totalDuration = 5L
@@ -57,22 +55,24 @@ class BuildMetricFactoryTest extends Specification {
         String scope = "testScope"
         String jobFolderName = "a_jobFolderName"
         folder.fullName >> jobFolderName
-        String commitTag = "GIT_COMMIT"
-        ImmutableMap.Builder<String, String> mapBuilder = ImmutableMap.<String, String>builder().put(commitTag,commitId);
-        Map<String, String> envVars = mapBuilder.build();
-        run.getEnvVars() >> envVars
+        String commitTag = TagFactory.Tag.GIT_COMMIT.toString()        
+        Map<String, String> envVars = [(commitTag): commitId]
+        run.getEnvironment(_) >> envVars
         run.getNumber() >> buildNumber
+        run.getResult() >> Result.SUCCESS
 
         BuildMetricFactory metricFactory = new BuildMetricFactory(jenkins, run, metricTimestamp, scope)
 
         when:
-        Metric metricTotalTime = metricFactory.getBuildTimeMetric(BuildMetricFactory.TOTAL_BUILD_TIME_LABEL,BuildMetricFactory.TOTAL_BUILD_TIME_METRIC,totalDuration)
+        Metric metricTotalTime = metricFactory.getBuildTimeMetric(BuildMetricFactory.TOTAL_BUILD_TIME_LABEL,
+            BuildMetricFactory.TOTAL_BUILD_TIME_METRIC,totalDuration)
 
         then:
 
-        metricTotalTime.tags[commitTag.toLowerCase()] == expectedCommit
-        metricTotalTime.tags['build_number'] == commitId.isEmpty() ? null : String.valueOf(buildNumber)
-        metricTotalTime.tags['project'].startsWith(jobFolderName)
+        metricTotalTime.tags[commitTag.toLowerCase()].equals(expectedCommit)
+        metricTotalTime.tags[TagFactory.Tag.BUILD_NUMBER.lower()].equals(commitId.isEmpty() ? null : String.valueOf(buildNumber))
+        metricTotalTime.tags[TagFactory.Tag.PROJECT.lower()].startsWith(jobFolderName)
+        metricTotalTime.tags[TagFactory.Tag.BUILD_STATUS.lower()].equals(commitId.isEmpty() ? null : Result.SUCCESS.toString())
 
 
         where:

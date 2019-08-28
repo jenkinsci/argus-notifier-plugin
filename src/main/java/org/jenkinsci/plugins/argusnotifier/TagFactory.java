@@ -13,7 +13,7 @@ import static org.jenkinsci.plugins.argusnotifier.TagFactory.Tag.*;
  */
 class TagFactory {
     enum Tag {
-        HOST, BUILD_NUMBER, GIT_COMMIT, PROJECT;
+        HOST, BUILD_NUMBER, GIT_COMMIT, BUILD_STATUS, PROJECT;
 
         public String lower() {
             return name().toLowerCase();
@@ -36,12 +36,21 @@ class TagFactory {
                 .put(PROJECT.lower(), InvalidCharSwap.swapWithDash(projectName)).build();
     }
 
+    /**
+     * Create immutable map of tags for build status tags
+     * @param jenkins Jenkins instance
+     * @param projectName
+     * @param buildNumber
+     * @param commitId
+     * @param status
+     * @return
+     */
     static Map<String, String> buildExtendedStatusTags(Jenkins jenkins, String projectName, String buildNumber,
-            String commitId) {
+            String commitId, String status) {
 
         ImmutableMap.Builder<String, String> mapBuilder = ImmutableMap.<String, String>builder()
                 .putAll(hostTag(jenkins)).put(PROJECT.lower(), InvalidCharSwap.swapWithDash(projectName));
-        mapBuilder.put(BUILD_NUMBER.lower(), buildNumber).put(GIT_COMMIT.lower(), commitId);
+        mapBuilder.put(BUILD_NUMBER.lower(), buildNumber).put(GIT_COMMIT.lower(), commitId).put(BUILD_STATUS.lower(),status);
         return mapBuilder.build();
 
     }

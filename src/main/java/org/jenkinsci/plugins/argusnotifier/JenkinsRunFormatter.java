@@ -2,18 +2,22 @@ package org.jenkinsci.plugins.argusnotifier;
 
 import hudson.model.AbstractBuild;
 import hudson.model.Run;
+import hudson.util.LogTaskListener;
 import jenkins.model.Jenkins;
-
+import java.util.logging.Level;
 import javax.annotation.Nonnull;
+import hudson.EnvVars;
+import java.io.IOException;
+import java.util.logging.Logger;
 
 /**
  * Formatter to consistently format Jenkins and Jenkins build info
  */
 class JenkinsRunFormatter {
 
-    public static final String GIT_COMMIT = "GIT_COMMIT";
     private final String jenkinsUrl;
     private final Run run;
+    private static final Logger logger = Logger.getLogger(JenkinsRunFormatter.class.getName());
 
     public JenkinsRunFormatter(@Nonnull Jenkins jenkins, @Nonnull Run run) {
         this.jenkinsUrl = jenkins.getRootUrl();
@@ -56,15 +60,33 @@ class JenkinsRunFormatter {
     public String getBuildNumberString() {
         return String.valueOf(run.getNumber());
     }
-
+    
+    
+    /**
+     * Get GIT_COMMIT environment variable if available.
+     * 
+     * 
+     * @return commit sha as String, return empty String if not available.
+     */
     public String getGitCommit() {
-
-        Object commitId = run.getEnvVars().get(GIT_COMMIT);
-        if (commitId == null) {
-            return "";
-        } else {
-            return (String) commitId;
+        
+        LogTaskListener listener = new LogTaskListener(logger, Level.INFO);
+        
+        String commitVar = TagFactory.Tag.GIT_COMMIT.toString();
+        try {
+            EnvVars envVars = run.getEnvironment(listener);
+            Object commitId = envVars.get(commitVar);
+            if (commitId == null) {
+                return "";
+            } else {
+                return (String) commitId;
+            }
         }
+        catch (IOException | InterruptedException e) {
+            return "";
+        }
+        
+
     }
 
     /**

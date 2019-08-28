@@ -1,13 +1,13 @@
 package org.jenkinsci.plugins.argusnotifier
 
 import hudson.model.*
+import hudson.util.LogTaskListener;
 import jenkins.model.Jenkins
 import org.junit.Rule
 import org.jvnet.hudson.test.JenkinsRule
 import org.jvnet.hudson.test.MockFolder
 import spock.lang.Specification
 import spock.lang.Unroll
-import com.google.common.collect.ImmutableMap
 
 @Unroll
 class JenkinsRunFormatterTest extends Specification {
@@ -18,6 +18,7 @@ class JenkinsRunFormatterTest extends Specification {
     private static final String TEST_BUILD_URL = "job/test/42/"
     private AbstractBuild build = Mock(AbstractBuild)
     private Jenkins jenkins = Mock(Jenkins)
+    private LogTaskListener listener = Mock(LogTaskListener)
 
     def setup() {
         build.getResult() >> Result.SUCCESS
@@ -71,13 +72,9 @@ class JenkinsRunFormatterTest extends Specification {
         actualBuildNumberString == String.valueOf(buildNumber)
     }
 
-    def "test getGitCommit returns commit sha"() {
+    def "test getGitCommit for #commitId returns commit sha #expectedGitCommit"() {
         given:
-        def gitCommit = commitId
-
-        ImmutableMap.Builder<String,String> mapBuilder = ImmutableMap.<String, String>builder()
-        mapBuilder.put(JenkinsRunFormatter.GIT_COMMIT, gitCommit)
-        build.getEnvVars() >> mapBuilder.build()
+        build.getEnvironment(_) >> [(TagFactory.Tag.GIT_COMMIT.toString()): commitId]
         JenkinsRunFormatter jenkinsBuildFormatter = new JenkinsRunFormatter(jenkins, build)
 
         when:
@@ -94,11 +91,7 @@ class JenkinsRunFormatterTest extends Specification {
 
     def "test getGitCommit no such env variable"() {
         given:
-        def gitCommit = "343245dsawer32fd43fd43"
-
-        ImmutableMap.Builder<String,String> mapBuilder = ImmutableMap.<String, String>builder()
-        mapBuilder.put("ENV_VAR", gitCommit)
-        build.getEnvVars() >> mapBuilder.build()
+        build.getEnvironment(_) >> [:]
         JenkinsRunFormatter jenkinsBuildFormatter = new JenkinsRunFormatter(jenkins, build)
 
         when:
