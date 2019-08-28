@@ -1,7 +1,6 @@
 package org.jenkinsci.plugins.argusnotifier
 
 import hudson.model.*
-import hudson.util.LogTaskListener;
 import jenkins.model.Jenkins
 import org.junit.Rule
 import org.jvnet.hudson.test.JenkinsRule
@@ -18,7 +17,6 @@ class JenkinsRunFormatterTest extends Specification {
     private static final String TEST_BUILD_URL = "job/test/42/"
     private AbstractBuild build = Mock(AbstractBuild)
     private Jenkins jenkins = Mock(Jenkins)
-    private LogTaskListener listener = Mock(LogTaskListener)
 
     def setup() {
         build.getResult() >> Result.SUCCESS

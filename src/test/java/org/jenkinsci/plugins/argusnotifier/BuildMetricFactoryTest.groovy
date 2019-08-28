@@ -5,7 +5,6 @@ import hudson.model.ItemGroup
 import hudson.model.Job
 import hudson.model.Run
 import hudson.model.Result
-import hudson.util.LogTaskListener;
 import jenkins.model.Jenkins
 import spock.lang.Specification
 import spock.lang.Unroll
@@ -17,7 +16,6 @@ class BuildMetricFactoryTest extends Specification {
     private Jenkins jenkins = Mock(Jenkins)
     private Run run = Mock(Run)
     private ItemGroup folder = Mock(ItemGroup)
-    private LogTaskListener listener = Mock(LogTaskListener)
 
     def setup() {
         jenkins.rootUrl >> "jenkinsrooturl"
