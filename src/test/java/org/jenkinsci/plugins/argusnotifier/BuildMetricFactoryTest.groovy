@@ -68,9 +68,9 @@ class BuildMetricFactoryTest extends Specification {
         then:
 
         metricTotalTime.tags[commitTag.toLowerCase()].equals(expectedCommit)
-        metricTotalTime.tags[TagFactory.Tag.BUILD_NUMBER.lower()].equals(commitId.isEmpty() ? null : String.valueOf(buildNumber))
+        metricTotalTime.tags[TagFactory.Tag.BUILD_NUMBER.lower()].equals(String.valueOf(buildNumber))
         metricTotalTime.tags[TagFactory.Tag.PROJECT.lower()].startsWith(jobFolderName)
-        metricTotalTime.tags[TagFactory.Tag.BUILD_STATUS.lower()].equals(commitId.isEmpty() ? null : Result.SUCCESS.toString())
+        metricTotalTime.tags[TagFactory.Tag.BUILD_STATUS.lower()].equals(Result.SUCCESS.toString())
 
 
         where:

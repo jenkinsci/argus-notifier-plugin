@@ -90,13 +90,9 @@ class BuildMetricFactory {
         double timeInSeconds = (double) timeInMillis / 1000.0;
 
         String gitCommitId = jenkinsRunFormatter.getGitCommit();
-        if (labelForDisplayName.equals(TOTAL_BUILD_TIME_LABEL) && !gitCommitId.isEmpty()) {
-            String buildStatus = BuildResultsResolver.getResultString(run.getResult());
-            metric.setTags(TagFactory.buildExtendedStatusTags(jenkins, jenkinsRunFormatter.getProjectName(),
-                    jenkinsRunFormatter.getBuildNumberString(), gitCommitId, buildStatus));
-        } else {
-            metric.setTags(TagFactory.buildStatusTags(jenkins, jenkinsRunFormatter.getProjectName()));
-        }
+        String buildStatus = BuildResultsResolver.getResultString(run.getResult());
+        metric.setTags(TagFactory.buildExtendedStatusTags(jenkins, jenkinsRunFormatter.getProjectName(),
+                jenkinsRunFormatter.getBuildNumberString(), gitCommitId, buildStatus));
         Map<Long, Double> datapoints = ImmutableMap.<Long, Double>builder().put(metricTimestamp, timeInSeconds).build();
         metric.setDatapoints(datapoints);
         return metric;

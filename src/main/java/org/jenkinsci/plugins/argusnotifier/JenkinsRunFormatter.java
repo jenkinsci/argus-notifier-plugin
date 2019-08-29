@@ -1,6 +1,5 @@
 package org.jenkinsci.plugins.argusnotifier;
 
-import hudson.model.AbstractBuild;
 import hudson.model.Run;
 import hudson.util.LogTaskListener;
 import jenkins.model.Jenkins;
@@ -66,7 +65,7 @@ class JenkinsRunFormatter {
      * Get GIT_COMMIT environment variable if available.
      * 
      * 
-     * @return commit sha as String, return empty String if not available.
+     * @return GIT commit sha as String, return empty String if not available.
      */
     public String getGitCommit() {
         

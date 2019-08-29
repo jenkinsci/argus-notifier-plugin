@@ -32,13 +32,16 @@ class TagFactory {
      * @return
      */
     static Map<String, String> buildStatusTags(Jenkins jenkins, String projectName) {
-        return ImmutableMap.<String, String>builder().putAll(hostTag(jenkins))
-                .put(PROJECT.lower(), InvalidCharSwap.swapWithDash(projectName)).build();
-    }
-
+        return ImmutableMap.<String, String>builder()
+                .putAll(hostTag(jenkins))
+                .put(PROJECT.lower(), InvalidCharSwap.swapWithDash(projectName))
+                .build();
+    }    
+    
     /**
-     * Create immutable map of tags for build status tags
-     * @param jenkins Jenkins instance
+     * Create immutable map of tags for a build time metric
+     * 
+     * @param jenkins
      * @param projectName
      * @param buildNumber
      * @param commitId
@@ -50,7 +53,12 @@ class TagFactory {
 
         ImmutableMap.Builder<String, String> mapBuilder = ImmutableMap.<String, String>builder()
                 .putAll(hostTag(jenkins)).put(PROJECT.lower(), InvalidCharSwap.swapWithDash(projectName));
-        mapBuilder.put(BUILD_NUMBER.lower(), buildNumber).put(GIT_COMMIT.lower(), commitId).put(BUILD_STATUS.lower(),status);
+        mapBuilder.put(BUILD_NUMBER.lower(), buildNumber).put(BUILD_STATUS.lower(),status);
+        
+        if (!commitId.isEmpty()) {
+            mapBuilder.put(GIT_COMMIT.lower(), commitId);
+        }
+            
         return mapBuilder.build();
 
     }
