@@ -41,11 +41,11 @@ class TagFactory {
     /**
      * Create immutable map of tags for a build time metric
      * 
-     * @param jenkins
-     * @param projectName
-     * @param buildNumber
-     * @param commitId
-     * @param status
+     * @param jenkins Jenkins instance
+     * @param projectName build project name
+     * @param buildNumber build number or id
+     * @param commitId github commit sha associated with this build, set to empty if not applicable
+     * @param status the build status, SUCCESS, FAILURE or UNSTABLE etc
      * @return
      */
     static Map<String, String> buildExtendedStatusTags(Jenkins jenkins, String projectName, String buildNumber,
