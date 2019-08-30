@@ -48,10 +48,10 @@ public class BuildResultsResolver {
                 return STILL_FAILING;
             }
         }
-        return getResultString(buildResult);
+        return getBuildResult(buildResult);
     }
 
-    public static String getResultString(Result buildResult) {
+    public static String getBuildResult(Result buildResult) {
         if (buildResult == null) {
             return UNKNOWN;
         } else {
@@ -60,10 +60,10 @@ public class BuildResultsResolver {
     }
 
     public static String getMetricName(Result buildResult) {
-        return "build." + BuildResultsResolver.getResultString(buildResult).toLowerCase();
+        return "build." + BuildResultsResolver.getBuildResult(buildResult).toLowerCase();
     }
 
     public static Double translateResultToNumber(Result result) {
-        return BUILD_STATUS_MAPPING.get(getResultString(result));
+        return BUILD_STATUS_MAPPING.get(getBuildResult(result));
     }
 }

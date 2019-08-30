@@ -15,11 +15,13 @@ import java.util.logging.Logger;
 class JenkinsRunFormatter {
 
     private final String jenkinsUrl;
+    private final String jenkinsHostName;
     private final Run run;
     private static final Logger logger = Logger.getLogger(JenkinsRunFormatter.class.getName());
 
     public JenkinsRunFormatter(@Nonnull Jenkins jenkins, @Nonnull Run run) {
         this.jenkinsUrl = jenkins.getRootUrl();
+        this.jenkinsHostName = JenkinsFormatter.getHostName(jenkins);
         this.run = run;
     }
 
@@ -60,32 +62,48 @@ class JenkinsRunFormatter {
         return String.valueOf(run.getNumber());
     }
     
-    
     /**
      * Get GIT_COMMIT environment variable if available.
      * 
      * 
      * @return GIT commit sha as String, return empty String if not available.
      */
-    public String getGitCommit() {
+    public String getGitCommitHash() {
         
         LogTaskListener listener = new LogTaskListener(logger, Level.INFO);
         
         String commitVar = TagFactory.Tag.GIT_COMMIT.toString();
         try {
             EnvVars envVars = run.getEnvironment(listener);
-            Object commitId = envVars.get(commitVar);
-            if (commitId == null) {
+            String commitHash = envVars.get(commitVar);
+            if (commitHash == null) {
                 return "";
             } else {
-                return (String) commitId;
+                return commitHash;
             }
         }
         catch (IOException | InterruptedException e) {
+            logger.log(Level.WARNING, "Error when retrieving environment to get GIT_COMMIT", e);
             return "";
         }
-        
+    }
 
+    /**
+     * Get the formatted Jenkins host name
+     *
+     * @return formatted Jenkins host name
+     */
+    public String getJenkinsHostName() {
+        return jenkinsHostName;
+    }
+
+    /**
+     * Convenience method to get the normal run result string
+     *
+     * @return maps to exact result unless null (then UNKNOWN)
+     */
+    public String getResult() {
+        return BuildResultsResolver.getBuildResult(run.getResult());
     }
 
     /**

@@ -76,7 +76,7 @@ class JenkinsRunFormatterTest extends Specification {
         JenkinsRunFormatter jenkinsBuildFormatter = new JenkinsRunFormatter(jenkins, build)
 
         when:
-        String actualGitCommit = jenkinsBuildFormatter.getGitCommit()
+        String actualGitCommit = jenkinsBuildFormatter.getGitCommitHash()
 
         then:
         actualGitCommit == expectedGitCommit
@@ -93,7 +93,7 @@ class JenkinsRunFormatterTest extends Specification {
         JenkinsRunFormatter jenkinsBuildFormatter = new JenkinsRunFormatter(jenkins, build)
 
         when:
-        String actualGitCommit = jenkinsBuildFormatter.getGitCommit()
+        String actualGitCommit = jenkinsBuildFormatter.getGitCommitHash()
 
         then:
         actualGitCommit == ""
