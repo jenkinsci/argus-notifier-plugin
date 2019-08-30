@@ -25,38 +25,22 @@ class TagFactory {
     }
 
     /**
-     * Create immutable map of tags for a build_status metric
-     *
-     * @param jenkins
-     * @param projectName
-     * @return
-     */
-    static Map<String, String> buildStatusTags(Jenkins jenkins, String projectName) {
-        return ImmutableMap.<String, String>builder()
-                .putAll(hostTag(jenkins))
-                .put(PROJECT.lower(), InvalidCharSwap.swapWithDash(projectName))
-                .build();
-    }    
-    
-    /**
      * Create immutable map of tags for a build time metric
      * 
-     * @param jenkins Jenkins instance
-     * @param projectName build project name
-     * @param buildNumber build number or id
-     * @param commitId github commit sha associated with this build, set to empty if not applicable
-     * @param status the build status, SUCCESS, FAILURE or UNSTABLE etc
-     * @return
+     * @param jenkinsRunFormatter a populated JenkinsRunFormatter
+     * @return map with populated tags
      */
-    static Map<String, String> buildExtendedStatusTags(Jenkins jenkins, String projectName, String buildNumber,
-            String commitId, String status) {
+    static Map<String, String> buildStatusTags(JenkinsRunFormatter jenkinsRunFormatter) {
 
         ImmutableMap.Builder<String, String> mapBuilder = ImmutableMap.<String, String>builder()
-                .putAll(hostTag(jenkins)).put(PROJECT.lower(), InvalidCharSwap.swapWithDash(projectName));
-        mapBuilder.put(BUILD_NUMBER.lower(), buildNumber).put(BUILD_STATUS.lower(),status);
-        
-        if (!commitId.isEmpty()) {
-            mapBuilder.put(GIT_COMMIT.lower(), commitId);
+                .put(HOST.lower(), jenkinsRunFormatter.getJenkinsHostName())
+                .put(PROJECT.lower(), InvalidCharSwap.swapWithDash(jenkinsRunFormatter.getProjectName()))
+                .put(BUILD_NUMBER.lower(), jenkinsRunFormatter.getBuildNumberString())
+                .put(BUILD_STATUS.lower(), jenkinsRunFormatter.getResult());
+
+        String gitCommitHash = jenkinsRunFormatter.getGitCommitHash();
+        if (!gitCommitHash.isEmpty()) {
+            mapBuilder.put(GIT_COMMIT.lower(), gitCommitHash);
         }
             
         return mapBuilder.build();

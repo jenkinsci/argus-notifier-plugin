@@ -79,7 +79,7 @@ class BuildResultsResolverTest extends Specification {
 
     def 'getResultString: #input generates #expected resultsString'() {
         when:
-        String resultsString = BuildResultsResolver.getResultString(input)
+        String resultsString = BuildResultsResolver.getBuildResult(input)
 
         then:
         resultsString == expected

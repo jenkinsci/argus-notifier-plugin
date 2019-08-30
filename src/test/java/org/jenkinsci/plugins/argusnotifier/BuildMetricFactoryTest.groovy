@@ -31,6 +31,7 @@ class BuildMetricFactoryTest extends Specification {
         String scope = "testScope"
         folder.fullName >> jobFolderName
         BuildMetricFactory metricFactory = new BuildMetricFactory(jenkins, run, metricTimestamp, scope)
+        run.getEnvironment(_) >> [:]
 
         when:
         List<Metric> metrics = metricFactory.buildStatusMetrics

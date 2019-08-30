@@ -26,10 +26,8 @@ class BuildMetricFactory {
     private final long metricTimestamp;
     private final String scope;
     private final JenkinsRunFormatter jenkinsRunFormatter;
-    private final Jenkins jenkins;
 
     BuildMetricFactory(Jenkins jenkins, Run run, long metricTimestamp, String scope) {
-        this.jenkins = jenkins;
         this.run = run;
         this.jenkinsRunFormatter = new JenkinsRunFormatter(jenkins, run);
         this.metricTimestamp = metricTimestamp;
@@ -44,15 +42,15 @@ class BuildMetricFactory {
         // TODO: statusTranslatedToNumberMetric.setNamespace(projectName);
 
         statusTranslatedToNumberMetric
-                .setTags(TagFactory.buildStatusTags(jenkins, jenkinsRunFormatter.getProjectName()));
+                .setTags(TagFactory.buildStatusTags(jenkinsRunFormatter));
         Map<Long, Double> numericStatusDatapoints = ImmutableMap.<Long, Double>builder()
                 .put(metricTimestamp, BuildResultsResolver.translateResultToNumber(run.getResult())).build();
         statusTranslatedToNumberMetric.setDatapoints(numericStatusDatapoints);
         Metric buildStatusMetric = new Metric();
         buildStatusMetric.setScope(scope);
-        buildStatusMetric.setDisplayName(getDisplayName(BuildResultsResolver.getResultString(run.getResult())));
+        buildStatusMetric.setDisplayName(getDisplayName(BuildResultsResolver.getBuildResult(run.getResult())));
         buildStatusMetric.setMetric(BuildResultsResolver.getMetricName(run.getResult()));
-        buildStatusMetric.setTags(TagFactory.buildStatusTags(jenkins, jenkinsRunFormatter.getProjectName()));
+        buildStatusMetric.setTags(TagFactory.buildStatusTags(jenkinsRunFormatter));
         Map<Long, Double> buildStatusDatapoints = ImmutableMap.<Long, Double>builder().put(metricTimestamp, 1.0)
                 .build();
         buildStatusMetric.setDatapoints(buildStatusDatapoints);
@@ -89,10 +87,7 @@ class BuildMetricFactory {
         // TODO: metric.setNamespace(projectName);
         double timeInSeconds = (double) timeInMillis / 1000.0;
 
-        String gitCommitId = jenkinsRunFormatter.getGitCommit();
-        String buildStatus = BuildResultsResolver.getResultString(run.getResult());
-        metric.setTags(TagFactory.buildExtendedStatusTags(jenkins, jenkinsRunFormatter.getProjectName(),
-                jenkinsRunFormatter.getBuildNumberString(), gitCommitId, buildStatus));
+        metric.setTags(TagFactory.buildStatusTags(jenkinsRunFormatter));
         Map<Long, Double> datapoints = ImmutableMap.<Long, Double>builder().put(metricTimestamp, timeInSeconds).build();
         metric.setDatapoints(datapoints);
         return metric;
