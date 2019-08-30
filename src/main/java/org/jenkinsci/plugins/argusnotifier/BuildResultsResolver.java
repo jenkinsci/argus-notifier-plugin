@@ -1,7 +1,6 @@
 package org.jenkinsci.plugins.argusnotifier;
 
 import com.google.common.collect.ImmutableMap;
-import hudson.model.AbstractBuild;
 import hudson.model.Result;
 import hudson.model.Run;
 

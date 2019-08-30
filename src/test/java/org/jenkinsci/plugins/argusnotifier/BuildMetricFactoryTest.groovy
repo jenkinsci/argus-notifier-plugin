@@ -4,6 +4,7 @@ import com.salesforce.dva.argus.sdk.entity.Metric
 import hudson.model.ItemGroup
 import hudson.model.Job
 import hudson.model.Run
+import hudson.model.Result
 import jenkins.model.Jenkins
 import spock.lang.Specification
 import spock.lang.Unroll
@@ -42,5 +43,39 @@ class BuildMetricFactoryTest extends Specification {
         jobFolderName | expectedDisplayName
         "myfolder"    | "myfolder." + FULL_JOB_NAME + ": " + BuildMetricFactory.NUMERIC_BUILD_STATUS_LABEL
         ""            | FULL_JOB_NAME + ": " + BuildMetricFactory.NUMERIC_BUILD_STATUS_LABEL
+    }
+
+    def 'Total build time metric with #commitId has git commit tag #expectedCommit'() {
+        given:
+        long metricTimestamp = 42L
+        long totalDuration = 5L
+        int buildNumber = 349506
+        String scope = "testScope"
+        String jobFolderName = "a_jobFolderName"
+        folder.fullName >> jobFolderName
+        String commitTag = TagFactory.Tag.GIT_COMMIT.toString()        
+        Map<String, String> envVars = [(commitTag): commitId]
+        run.getEnvironment(_) >> envVars
+        run.getNumber() >> buildNumber
+        run.getResult() >> Result.SUCCESS
+
+        BuildMetricFactory metricFactory = new BuildMetricFactory(jenkins, run, metricTimestamp, scope)
+
+        when:
+        Metric metricTotalTime = metricFactory.getBuildTimeMetric(BuildMetricFactory.TOTAL_BUILD_TIME_LABEL,
+            BuildMetricFactory.TOTAL_BUILD_TIME_METRIC,totalDuration)
+
+        then:
+
+        metricTotalTime.tags[commitTag.toLowerCase()].equals(expectedCommit)
+        metricTotalTime.tags[TagFactory.Tag.BUILD_NUMBER.lower()].equals(String.valueOf(buildNumber))
+        metricTotalTime.tags[TagFactory.Tag.PROJECT.lower()].startsWith(jobFolderName)
+        metricTotalTime.tags[TagFactory.Tag.BUILD_STATUS.lower()].equals(Result.SUCCESS.toString())
+
+
+        where:
+        commitId                  | expectedCommit
+        "32ds34frg4534ff34fdcdds" | "32ds34frg4534ff34fdcdds"
+        ""                        | null
     }
 }

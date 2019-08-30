@@ -43,23 +43,18 @@ class BuildMetricFactory {
         statusTranslatedToNumberMetric.setMetric(BUILD_STATUS);
         // TODO: statusTranslatedToNumberMetric.setNamespace(projectName);
 
-        statusTranslatedToNumberMetric.setTags(TagFactory.buildStatusTags(jenkins,
-                jenkinsRunFormatter.getProjectName()));
-        Map<Long, Double> numericStatusDatapoints =
-                ImmutableMap.<Long, Double>builder()
-                        .put(metricTimestamp, BuildResultsResolver.translateResultToNumber(run.getResult()))
-                        .build();
+        statusTranslatedToNumberMetric
+                .setTags(TagFactory.buildStatusTags(jenkins, jenkinsRunFormatter.getProjectName()));
+        Map<Long, Double> numericStatusDatapoints = ImmutableMap.<Long, Double>builder()
+                .put(metricTimestamp, BuildResultsResolver.translateResultToNumber(run.getResult())).build();
         statusTranslatedToNumberMetric.setDatapoints(numericStatusDatapoints);
         Metric buildStatusMetric = new Metric();
         buildStatusMetric.setScope(scope);
         buildStatusMetric.setDisplayName(getDisplayName(BuildResultsResolver.getResultString(run.getResult())));
         buildStatusMetric.setMetric(BuildResultsResolver.getMetricName(run.getResult()));
-        buildStatusMetric.setTags(TagFactory.buildStatusTags(jenkins,
-                jenkinsRunFormatter.getProjectName()));
-        Map<Long, Double> buildStatusDatapoints =
-                ImmutableMap.<Long, Double>builder()
-                        .put(metricTimestamp, 1.0)
-                        .build();
+        buildStatusMetric.setTags(TagFactory.buildStatusTags(jenkins, jenkinsRunFormatter.getProjectName()));
+        Map<Long, Double> buildStatusDatapoints = ImmutableMap.<Long, Double>builder().put(metricTimestamp, 1.0)
+                .build();
         buildStatusMetric.setDatapoints(buildStatusDatapoints);
         return ImmutableList.of(statusTranslatedToNumberMetric, buildStatusMetric);
     }
@@ -76,8 +71,7 @@ class BuildMetricFactory {
             buildingDurationMillis = Math.max(0L, System.currentTimeMillis() - run.getStartTimeInMillis());
             totalDurationMillis = timeInQueueAction.getQueuingDurationMillis() + buildingDurationMillis;
         }
-        return ImmutableList.of(
-                getBuildTimeMetric(BUILD_TIME_LABEL, BUILD_TIME_METRIC, buildingDurationMillis),
+        return ImmutableList.of(getBuildTimeMetric(BUILD_TIME_LABEL, BUILD_TIME_METRIC, buildingDurationMillis),
                 getBuildTimeMetric(QUEUE_TIME_LABEL, QUEUE_TIME_METRIC, timeInQueueAction.getQueuingDurationMillis()),
                 getBuildTimeMetric(TOTAL_BUILD_TIME_LABEL, TOTAL_BUILD_TIME_METRIC, totalDurationMillis));
     }
@@ -95,12 +89,11 @@ class BuildMetricFactory {
         // TODO: metric.setNamespace(projectName);
         double timeInSeconds = (double) timeInMillis / 1000.0;
 
-        metric.setTags(TagFactory.buildStatusTags(jenkins,
-                jenkinsRunFormatter.getProjectName()));
-        Map<Long, Double> datapoints =
-                ImmutableMap.<Long, Double>builder()
-                        .put(metricTimestamp, timeInSeconds)
-                        .build();
+        String gitCommitId = jenkinsRunFormatter.getGitCommit();
+        String buildStatus = BuildResultsResolver.getResultString(run.getResult());
+        metric.setTags(TagFactory.buildExtendedStatusTags(jenkins, jenkinsRunFormatter.getProjectName(),
+                jenkinsRunFormatter.getBuildNumberString(), gitCommitId, buildStatus));
+        Map<Long, Double> datapoints = ImmutableMap.<Long, Double>builder().put(metricTimestamp, timeInSeconds).build();
         metric.setDatapoints(datapoints);
         return metric;
     }
