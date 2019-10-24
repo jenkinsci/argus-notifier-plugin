@@ -9,7 +9,7 @@
     </parent>
 
     <artifactId>argus-notifier</artifactId>
-    <version>1.0.7-SNAPSHOT</version>
+    <version>1.1-SNAPSHOT</version>
     <packaging>hpi</packaging>
 
     <properties>
@@ -43,7 +43,7 @@
     <name>Argus Notifier Plugin</name>
     <description>The Argus Notifier plugin sends build and system metrics to an
         [Argus|https://github.com/salesforce/Argus] server.</description>
-    <url>https://wiki.jenkins-ci.org/display/JENKINS/Argus+Notifier+Plugin</url>
+    <url>https://github.com/jenkinsci/argus-notifier-plugin</url>
 
     <licenses>
         <license>
