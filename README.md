@@ -1,6 +1,8 @@
 # Argus Notifier
 [![License](https://img.shields.io/github/license/jenkinsci/argus-notifier.svg)](LICENSE)
-[![wiki](https://img.shields.io/badge/Argus%20Notifier%20Plugin-WIKI-blue.svg?style=flat)](https://plugins.jenkins.io/argus-notifier)
+[![Jenkins Plugin](https://img.shields.io/jenkins/plugin/v/argus-notifier.svg)](https://plugins.jenkins.io/argus-notifier)
+[![GitHub release](https://img.shields.io/github/release/jenkinsci/argus-notifier-plugin.svg?label=changelog)](https://github.com/jenkinsci/argus-notifier-plugin/releases/latest)
+[![Jenkins Plugin Installs](https://img.shields.io/jenkins/plugin/i/argus-notifier.svg?color=blue)](https://plugins.jenkins.io/argus-notifier)
 
 This Jenkins plugin sends build status and build time (including queue time, build time, and total time) to 
 an [Argus](https://github.com/salesforce/Argus) endpoint. It also sends system metrics from the 
