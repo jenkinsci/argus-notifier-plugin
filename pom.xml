@@ -29,7 +29,7 @@
         <groovy.eclipse.batch.version>2.4.3-01</groovy.eclipse.batch.version>
         <groovy.eclipse.compiler.version>2.9.2-01</groovy.eclipse.compiler.version>
         <groovy.version>2.4.12</groovy.version>
-        <jacoco-maven-plugin.version>0.7.9</jacoco-maven-plugin.version>
+        <jacoco-maven-plugin.version>0.8.5</jacoco-maven-plugin.version>
         <jenkins-credentials.version>2.1.5</jenkins-credentials.version>
         <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
 
