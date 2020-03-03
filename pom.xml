@@ -34,7 +34,7 @@
         <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
 
         <mockito-core.version>2.7.22</mockito-core.version>
-        <maven-compiler-plugin.version>3.6.1</maven-compiler-plugin.version>
+        <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
         <metrics.version>3.1.2.9</metrics.version>
         <structs.version>1.10</structs.version>
         <jackson2-api.version>2.9.8</jackson2-api.version>
