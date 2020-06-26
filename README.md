@@ -1,5 +1,5 @@
 # Argus Notifier
-**NOTE: This plugin is no longer maintained and is up for adoption.**
+**NOTE: This plugin is no longer maintained and is up for adoption. Be aware that there may be vulnerable dependencies as a result.**
 
 [![License](https://img.shields.io/github/license/jenkinsci/argus-notifier.svg)](LICENSE)
 [![Jenkins Plugin](https://img.shields.io/jenkins/plugin/v/argus-notifier.svg)](https://plugins.jenkins.io/argus-notifier)
