@@ -26,7 +26,7 @@
              ~ stapler-plugin.version: The Stapler Maven plugin version required by the plugin.
         -->
         <argus-sdk.version>2.22.0</argus-sdk.version>
-        <groovy.eclipse.batch.version>2.4.3-01</groovy.eclipse.batch.version>
+        <groovy.eclipse.batch.version>3.0.5-01</groovy.eclipse.batch.version>
         <groovy.eclipse.compiler.version>3.6.0-03</groovy.eclipse.compiler.version>
         <groovy.version>2.4.19</groovy.version>
         <jacoco-maven-plugin.version>0.8.5</jacoco-maven-plugin.version>
