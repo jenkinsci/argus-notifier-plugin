@@ -36,7 +36,7 @@
         <mockito-core.version>2.7.22</mockito-core.version>
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
         <metrics.version>3.1.2.9</metrics.version>
-        <structs.version>1.20</structs.version>
+        <structs.version>1.21</structs.version>
         <jackson2-api.version>2.9.8</jackson2-api.version>
     </properties>
 
