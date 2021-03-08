@@ -28,7 +28,7 @@
         <argus-sdk.version>2.22.0</argus-sdk.version>
         <groovy.eclipse.batch.version>2.4.3-01</groovy.eclipse.batch.version>
         <groovy.eclipse.compiler.version>3.6.0-03</groovy.eclipse.compiler.version>
-        <groovy.version>2.4.19</groovy.version>
+        <groovy.version>3.0.4</groovy.version>
         <jacoco-maven-plugin.version>0.8.5</jacoco-maven-plugin.version>
         <jenkins-credentials.version>2.1.5</jenkins-credentials.version>
         <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
