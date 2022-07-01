@@ -30,7 +30,7 @@
         <groovy.eclipse.compiler.version>3.7.0</groovy.eclipse.compiler.version>
         <groovy.version>2.4.21</groovy.version>
         <jacoco-maven-plugin.version>0.8.7</jacoco-maven-plugin.version>
-        <jenkins-credentials.version>2.3.19</jenkins-credentials.version>
+        <jenkins-credentials.version>1139.veb_9579fca_33b_</jenkins-credentials.version>
         <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
 
         <mockito-core.version>2.7.22</mockito-core.version>
