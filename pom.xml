@@ -37,7 +37,7 @@
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
         <metrics.version>3.1.2.9</metrics.version>
         <structs.version>1.23</structs.version>
-        <jackson2-api.version>2.12.4-1</jackson2-api.version>
+        <jackson2-api.version>2.13.4-293.vee957901b_6fb</jackson2-api.version>
     </properties>
 
     <name>Argus Notifier Plugin</name>
